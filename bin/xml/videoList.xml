@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<videoList>
+<LoaderMax name="videoListLoader" prependURLs="assets/" load="true" maxConnections="2" >
+	 <VideoLoader url="movie01.f4v" name="videoID0" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="true" estimatedBytes="8887418" />
+	 <VideoLoader url="movie02.mp4" name="videoID1" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="14602065" />
+	 <VideoLoader url="movie03.mp4" name="videoID2" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
+</LoaderMax>
+</videoList>
