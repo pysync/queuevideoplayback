@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="iso-8859-1"?>
 <videoList>
-<LoaderMax name="videoListLoader" prependURLs="assets/" load="true" maxConnections="2" >
-	 <VideoLoader url="movie01.f4v" name="videoID0" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="true" estimatedBytes="8887418" />
-	 <VideoLoader url="movie02.mp4" name="videoID1" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="14602065" />
-	 <VideoLoader url="movie03.mp4" name="videoID2" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
+<LoaderMax name="trackListLoader" prependURLs="assets/" load="true" maxConnections="1" >
+	<MP3Loader url="music01.mp3" name="T_0" autoPlay="false" repeat="-1" />
+</LoaderMax>
+
+<LoaderMax name="videoListLoader" prependURLs="assets/" load="true" maxConnections="1" >
+	 <VideoLoader url="movie14.mp4" name="V_0" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="true" estimatedBytes="8887418" />
+	 <VideoLoader url="movie21.mp4" name="V_1" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="14602065" />
+	 <VideoLoader url="movie30.mp4" name="V_2" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
+	 <VideoLoader url="movie32.mp4" name="V_3" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
+	 <VideoLoader url="movie34.mp4" name="V_4" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
+	 <VideoLoader url="movie35.mp4" name="V_5" width="480" height="320" scaleMode="proportionalInside" centerRegistration="true" alpha="1" autoPlay="false" estimatedBytes="37803458" />
 </LoaderMax>
 </videoList>
