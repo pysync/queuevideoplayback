@@ -12,13 +12,32 @@
 	import flash.geom.Rectangle;
 
 
+	
 	public class Main extends MovieClip {
-
+		
+		// data
+		private var _videoData: Array = [
+		   	{ url:"movie14.mp4", vars: {name:"V_0", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
+	        { url:"movie21.mp4", vars: {name:"V_1", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
+	        { url:"movie30.mp4", vars: {name:"V_2", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+	        { url:"movie32.mp4", vars: {name:"V_3", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+	        { url:"movie34.mp4", vars: {name:"V_4", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+	        { url:"movie35.mp4", vars: {name:"V_5", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
+		];
+		
+		private var _videoPrependURLs = "assets/";  
+		
+		private var _trackData: Array = [
+			{ url: "music01.mp3", vars: {name:"T_0", autoPlay:false, repeat:-1} }
+		];  
+		
+		private var _trackPrependURLs = "assets/";                               
+		
 		//an array containing the VideoLoaders in the order they should be played
-		private var _videos: Array;
+		private var _videos: Array = [];
 
 		//an array containing the Mp3Loaders in the order they should be played
-		private var _tracks: Array;
+		private var _tracks: Array = [];
 
 		//keeps track of the VideoLoader that is currently playing
 		private var _currentVideo: VideoLoader;
@@ -48,22 +67,103 @@
 		private var _isDebugEnable: Boolean;
 
 		public function Main() {
+			_silentMode = true;
+			_isStarted = false;
+			_isDebugEnable = true;
 			stage.scaleMode = "noScale";
-			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
-
-
+			
 			initUI();
 			initMonitor();
+			activateUI();
+			
+			startTrackLoaderMax();
+			startVideoLoaderMax();
+			
+			preloader_mc.alpha = 1;
+		}
 
+		
+		private function startLoaderMaxXML(): void {
+			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
 			var xmlLoader: XMLLoader = new XMLLoader("xml/videoList.xml", {
 				name: "videoList",
 				onComplete: xmlHandler
 			});
-			_silentMode = true;
-			_isStarted = false;
-			_isDebugEnable = true;
 			xmlLoader.load();
+		}
+		
+		private function startTrackLoaderMax(): void {
+			var trackQueue:LoaderMax = new LoaderMax({
+				name: "trackDataList",
+				maxConnections:1,
+				onProgress:trackLoaderProgressHandler,
+				onComplete:trackLoaderCompleteHandler,
+				onChildProgress:childTrackLoaderProgressHandler,
+				onChildComplete:childTrackLoaderCompleteHandler
+			});
 
+			
+			for(var i = 0; i < _trackData.length; i++) {
+				trackQueue.append(new MP3Loader(_trackData[i].url, _trackData[i].vars))
+			}
+			
+			trackQueue.prependURLs("assets/");
+			trackQueue.load();
+			_tracks = trackQueue.getChildren();
+		}
+		
+		private function startVideoLoaderMax(): void {
+			var videoQueue:LoaderMax = new LoaderMax({
+				name: "videoDataList",
+				maxConnections:1,
+				onProgress:videoLoaderProgressHandler,
+				onComplete:videoLoaderCompleteHandler,
+				onChildProgress:childVideoLoaderProgressHandler,
+				onChildComplete:childVideoLoaderCompleteHandler
+			});
+			
+			for(var j = 0; j < _videoData.length; j++) {
+				videoQueue.append(new VideoLoader(_videoData[j].url, _videoData[j].vars));
+			}
+			videoQueue.prependURLs("assets/");
+			videoQueue.load();
+			_videos = videoQueue.getChildren();
+		}	
+		
+		private function trackLoaderProgressHandler(event:LoaderEvent):void {
+			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
+						
+		}
+		
+		private function trackLoaderCompleteHandler(event:LoaderEvent): void {
+			preloader_mc.totalPercent_mc.text = "Total: DONE!";
+			
+			showVideo(_videos[0]);
+		}
+		
+		private function childTrackLoaderProgressHandler(event:LoaderEvent): void {
+			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
+		}
+		
+		private function childTrackLoaderCompleteHandler(event:LoaderEvent): void {
+			preloader_mc.childPercent_mc.text = "Child: DONE!"
+		}
+
+		private function videoLoaderProgressHandler(event:LoaderEvent):void {
+			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
+						
+		}
+		
+		private function videoLoaderCompleteHandler(event:LoaderEvent): void {
+			preloader_mc.totalPercent_mc.text = "Total: DONE!";
+		}
+		
+		private function childVideoLoaderProgressHandler(event:LoaderEvent): void {
+			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
+		}
+		
+		private function childVideoLoaderCompleteHandler(event:LoaderEvent): void {
+			preloader_mc.childPercent_mc.text = "Child: DONE!"
 		}
 
 		private function xmlHandler(event: LoaderEvent): void {
