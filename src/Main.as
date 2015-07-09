@@ -48,6 +48,7 @@
 		private var _isDebugEnable: Boolean;
 		
 		public function Main() {
+			stage.scaleMode = "noScale";
 			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
 
 

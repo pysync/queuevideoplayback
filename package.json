@@ -1,12 +1,26 @@
 {
   "name": "tbs",
   "version": "1.0.0",
-  "description": "tbs video generator",
+  "description": "TBS Video Preview",
   "main": "server.js",
+  "bin": {
+    "tbs": "swfobject.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@heroku.com:tbs-dev.git"
+  },
+  "keywords": [
+    "video",
+    "preview"
+  ],
   "author": "dungntnew",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.1"
+  }
 }
