@@ -10,43 +10,43 @@
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.loading.MP3Loader;
 	import flash.geom.Rectangle;
-	
+
 
 	public class Main extends MovieClip {
-		
+
 		//an array containing the VideoLoaders in the order they should be played
 		private var _videos: Array;
-		
+
 		//an array containing the Mp3Loaders in the order they should be played
 		private var _tracks: Array;
-		
+
 		//keeps track of the VideoLoader that is currently playing
 		private var _currentVideo: VideoLoader;
 
 		// keeps track of the Mp3Loader that is currently playing
 		private var _currentTrack: MP3Loader;
-		
+
 		// keeps track selected sound index
 		private var _trackIndex: int;
-		
+
 		//if true, the mouse is over the video or UI controls
 		private var _mouseIsOver: Boolean;
 
 		//If true, the audio has been muted
 		private var _silentMode: Boolean;
-		
+
 		//If true, the background music há been muted
 		private var _silentModeBG: Boolean;
-		
+
 		//where is play started
 		private var _isStarted: Boolean
 
 		//tracks whether or not the video was paused when the user moused-down on the scrubber. We must pause for scrubbing, but this tells us whether or not to playVideo() when the user releases the mouse. 
 		private var _preScrubPaused: Boolean;
-		
+
 		//DEBUG FLAG
 		private var _isDebugEnable: Boolean;
-		
+
 		public function Main() {
 			stage.scaleMode = "noScale";
 			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
@@ -63,7 +63,7 @@
 			_isStarted = false;
 			_isDebugEnable = true;
 			xmlLoader.load();
-			
+
 		}
 
 		private function xmlHandler(event: LoaderEvent): void {
@@ -71,7 +71,7 @@
 			var trackQueue: LoaderMax = LoaderMax.getLoader("trackListLoader");
 			_tracks = trackQueue.getChildren();
 			trackQueue.load();
-			
+
 			//get the LoaderMax named "videoListLoader" which was inside our XML
 			var videoQueue: LoaderMax = LoaderMax.getLoader("videoListLoader");
 
@@ -107,11 +107,19 @@
 				_currentVideo.removeEventListener(LoaderEvent.PROGRESS, updateDownloadProgress);
 				_currentVideo.removeEventListener(VideoLoader.VIDEO_COMPLETE, nextVideo);
 				_currentVideo.removeEventListener(VideoLoader.PLAY_PROGRESS, updatePlayProgress);
+				_currentVideo.removeEventListener(VideoLoader.VIDEO_BUFFER_FULL, bufferFullHandler);
+				_currentVideo.removeEventListener(LoaderEvent.INIT, refreshTotalTime);
 
 				//If the video is paused, we should togglePlayPause() so that the new video plays and the interface matches.
 				if (_currentVideo.videoPaused) {
 					togglePlayPause();
 				}
+
+				//fade out the preloader and then stop() it. If the new video needs to display the preloader, that's okay because the fade-in tween we create later will overwrite this one.
+				TweenMax.to(preloader_mc, 0.3, {
+					autoAlpha: 0,
+					onComplete: preloader_mc.stop
+				});
 
 				//fade the current (old) video's alpha out. Remember the VideoLoader's "content" refers to the ContentDisplay Sprite we see on the screen.
 				TweenMax.to(_currentVideo.content, 0.8, {
@@ -136,10 +144,25 @@
 
 			//listen for PLAY_PROGRESS events so that we can update the progressBar_mc's scaleX accordingly
 			_currentVideo.addEventListener(VideoLoader.PLAY_PROGRESS, updatePlayProgress);
-			
+
+			//if the video hasn't fully loaded yet and is still buffering, show the preloader
+			if (_currentVideo.progress < 1 && _currentVideo.bufferProgress < 1) {
+
+				//when the buffer fills, we'll fade out the preloader
+				_currentVideo.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, bufferFullHandler);
+
+				//prioritizing the video ensures that it moves to the top of the LoaderMax gueue and any other loaders that were loading are canceled to maximize bandwidth available for the new video.
+				_currentVideo.prioritize(true);
+
+				//play() the preloader and fade its alpha up.
+				preloader_mc.play();
+				TweenMax.to(preloader_mc, 0.3, {
+					autoAlpha: 1
+				});
+			}
+
 			//start playing the video from its beginning
 			_currentVideo.gotoVideoTime(0, true);
-			
 
 			//always start with the volume at 0, and fade it up to 1 if necessary.
 			_currentVideo.volume = 0;
@@ -148,8 +171,8 @@
 					volume: 1
 				});
 			}
-			
-			//only seek time to zero if first time play or video index = 0
+            
+            //only seek time to zero if first time play or video index = 0
 			var _videoIndex = _videos.indexOf(_currentVideo);
 			if (!_isStarted || _videoIndex == 0) {
 				_isStarted = true;
@@ -164,8 +187,7 @@
 					});
 				}
 			}
-			
-			
+
 			//when we addChild() the VideoLoader's content, it makes it rise to the top of the stacking order
 			videoContainer_mc.addChild(_currentVideo.content);
 
@@ -173,33 +195,41 @@
 			TweenMax.to(_currentVideo.content, 0.8, {
 				autoAlpha: 1
 			});
-			
+
+			//update the total time display
+			refreshTotalTime();
+
+			//if the VideoLoader hasn't received its metaData yet (which contains duration information), we should set up a listener so that the total time gets updated when the metaData is received.
+			if (_currentVideo.metaData == null) {
+				_currentVideo.addEventListener(LoaderEvent.INIT, refreshTotalTime);
+			}
+
 			//update the progressBar_mc and loadingBar_mc
 			updateDownloadProgress();
 			updatePlayProgress();
-			
-			//update DEBUG
+            
+            //update DEBUG
 			updateMonitor();
 		}
 
 		private function initMonitor(): void {
-			if (!_isDebugEnable) 
+			if (!_isDebugEnable)
 				return;
-			
+
 			var videoIndex = _videos.indexOf(_currentVideo);
 			var trackIndex = _tracks.indexOf(_currentTrack);
-			
+
 			monitor_mc.videoId_mc.text = "scene: --";
 			monitor_mc.trackId_mc.text = "track: --";
 		}
-		
+
 		private function updateMonitor(): void {
-			if (!_isDebugEnable) 
+			if (!_isDebugEnable)
 				return;
-			
+
 			var videoIndex = _videos.indexOf(_currentVideo);
 			var trackIndex = _tracks.indexOf(_currentTrack);
-			
+
 			monitor_mc.videoId_mc.text = "scene: " + videoIndex;
 			monitor_mc.trackId_mc.text = "track: " + trackIndex;
 		}
@@ -236,6 +266,13 @@
 			controlUI_mc.loadingBar_mc.scaleX = _currentVideo.progress;
 		}
 
+		private function bufferFullHandler(event: LoaderEvent): void {
+			TweenMax.to(preloader_mc, 0.3, {
+				autoAlpha: 0,
+				onComplete: preloader_mc.stop
+			});
+		}
+
 		private function force2Digits(value: Number): String {
 			return (value < 10) ? "0" + String(value) : String(value);
 		}
@@ -250,15 +287,55 @@
 
 		}
 
+		private function refreshTotalTime(event: LoaderEvent = null): void {
+			var minutes: String = force2Digits(int(_currentVideo.duration / 60));
+			var seconds: String = force2Digits(int(_currentVideo.duration % 60));
+			controlUI_mc.totalTime_tf.text = minutes + ":" + seconds;
+		}
+
 		private function activateUI(): void {
 
 			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OVER, toggleControlUI);
 			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OUT, toggleControlUI);
 			addListeners([controlUI_mc.playPauseButton_mc, playPauseBigButton_mc, videoContainer_mc], MouseEvent.CLICK, togglePlayPause);
 			controlUI_mc.scrubber_mc.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownScrubber);
+			controlUI_mc.loadingBar_mc.addEventListener(MouseEvent.CLICK, scrubToMouse);
 			controlUI_mc.audio_mc.addEventListener(MouseEvent.CLICK, toggleAudio);
 			controlUI_mc.next_mc.addEventListener(MouseEvent.CLICK, nextVideo);
 			controlUI_mc.back_mc.addEventListener(MouseEvent.CLICK, previousVideo);
+			
+			var controls:Array = [controlUI_mc.playPauseButton_mc, 
+								  playPauseBigButton_mc, 
+								  controlUI_mc.back_mc, 
+								  controlUI_mc.next_mc, 
+								  controlUI_mc.audio_mc, 
+								  controlUI_mc.scrubber_mc];
+			var i:int = controls.length;
+			while (i--) {
+			    //controls[i].buttonMode = true;
+			    //controls[i].mouseChildren = false;
+			}
+			
+			addListeners([controlUI_mc.back_mc, controlUI_mc.audio_mc, controlUI_mc.next_mc], MouseEvent.ROLL_OVER, blackRollOverHandler);
+			addListeners([controlUI_mc.back_mc, controlUI_mc.audio_mc, controlUI_mc.next_mc], MouseEvent.ROLL_OUT, blackRollOutHandler);
+			controlUI_mc.playPauseButton_mc.addEventListener(MouseEvent.ROLL_OVER, growPlayPause);
+			controlUI_mc.playPauseButton_mc.addEventListener(MouseEvent.ROLL_OUT, shrinkPlayPause);
+		}
+		
+		private function blackRollOverHandler(event:MouseEvent):void {
+		    //TweenMax.to(event.target.label, 0.3, {tint:0xFFFFFF});
+		}
+
+		private function blackRollOutHandler(event:MouseEvent):void {
+		    //TweenMax.to(event.target.label, 0.3, {tint:null});
+		}
+		
+		private function growPlayPause(event:MouseEvent):void {
+		    TweenMax.to(event.target, 0.2, {scaleX:1.3, scaleY:1.3});
+		}
+
+		private function shrinkPlayPause(event:MouseEvent):void {
+		    TweenMax.to(event.target, 0.2, {scaleX:1, scaleY:1});
 		}
 
 		private function mouseDownScrubber(event: MouseEvent): void {
@@ -304,10 +381,10 @@
 				//controlUI_mc.audio_mc.label.gotoAndStop("on");
 			}
 		}
-		
+
 		private function toggleBGSoundTrack(event: MouseEvent): void {
 			_silentModeBG = !_silentModeBG;
-			if (_silentModeBG){
+			if (_silentModeBG) {
 				_currentTrack.volume = 0;
 			} else {
 				_currentTrack.volume = 1;
