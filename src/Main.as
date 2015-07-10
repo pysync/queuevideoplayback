@@ -10,19 +10,21 @@
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.loading.MP3Loader;
 	import flash.geom.Rectangle;
-
+	import flash.display.Sprite;
+	import com.greensock.loading.ImageLoader;
+	
 
 	
 	public class Main extends MovieClip {
 		
 		// data
 		private var _videoData: Array = [
-		   	{ url:"movie14.mp4", vars: {name:"V_0", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
-	        { url:"movie21.mp4", vars: {name:"V_1", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
-	        { url:"movie30.mp4", vars: {name:"V_2", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-	        { url:"movie32.mp4", vars: {name:"V_3", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-	        { url:"movie34.mp4", vars: {name:"V_4", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-	        { url:"movie35.mp4", vars: {name:"V_5", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
+			{ url:"movie14.mp4", vars: {name:"V_0", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
+			{ url:"movie21.mp4", vars: {name:"V_1", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
+			{ url:"movie30.mp4", vars: {name:"V_2", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie32.mp4", vars: {name:"V_3", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie34.mp4", vars: {name:"V_4", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie35.mp4", vars: {name:"V_5", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
 		];
 		
 		private var _videoPrependURLs = "assets/";  
@@ -66,7 +68,65 @@
 		//DEBUG FLAG
 		private var _isDebugEnable: Boolean;
 
+
+
+		 
+		 //when the image loads, fade it in from alpha:0 using TweenLite
+		 function onImageLoad(event:LoaderEvent):void {
+			 
+		 }
+	
+		private var _thumbs:Array = [
+			"http://vignette2.wikia.nocookie.net/swordartonline/images/e/ee/Yui.png/revision/latest/scale-to-width-down/275?cb=20140228061052",
+			"http://vignette4.wikia.nocookie.net/swordartonline/images/a/a9/Sao-kirito-asuna-yui-family.png/revision/latest/scale-to-width-down/212?cb=20150705222747",
+			"http://vignette2.wikia.nocookie.net/swordartonline/images/6/6b/LS_Concert_Event.png/revision/latest/scale-to-width-down/212?cb=20150611103807",
+			"http://vignette2.wikia.nocookie.net/swordartonline/images/7/7e/LS_Seven_and_Sinon_2.png/revision/latest/scale-to-width-down/212?cb=20150611103552",
+			"http://vignette4.wikia.nocookie.net/swordartonline/images/7/7a/LS_Asuna_event.png/revision/latest/scale-to-width-down/212?cb=20150610200221",
+			"http://vignette2.wikia.nocookie.net/swordartonline/images/e/ef/Karatachi_Nijika.png/revision/latest/scale-to-width-down/212?cb=20150610194924",
+			"http://vignette1.wikia.nocookie.net/swordartonline/images/a/a9/LS_Characters.png/revision/latest/scale-to-width-down/212?cb=20150610193407",
+			"http://vignette4.wikia.nocookie.net/swordartonline/images/4/4c/LS_Sumeragi_vs_Kirito.png/revision/latest/scale-to-width-down/212?cb=20150610190729",
+			"http://vignette2.wikia.nocookie.net/swordartonline/images/c/ca/LS_Aftermath.png/revision/latest/scale-to-width-down/212?cb=20150610193123"
+		];
 		public function Main() {
+			
+			var p:MovieClip = availableMovieListPanel;
+			p.removeChildren(0);
+			
+			var q:LoaderMax = new LoaderMax();
+			
+			for(var i = 0; i < 3; i++) {
+				for (var j = 0; j < 3; j ++){
+					
+					var index = (i * 3) + j;
+					var v:VideoItem = new VideoItem();
+					v.x = 100 + j * 150;
+					v.y = 50 + i * 100;
+					p.addChild(v);
+					v.titleText.text = "Video: [" + index + "]";
+					
+					 //create an ImageLoader:
+					 var loader:ImageLoader = new ImageLoader(_thumbs[index], 
+								{
+									name:"thumb01", 
+									container:v.thumbnail,
+									x:0, y:0, 
+									width:120, 
+									height:68, 
+									scaleMode:"proportionalInside",
+									centerRegistration:true, 
+									onComplete:onImageLoad
+								});
+				 
+					q.append(loader);
+								
+				}
+			}
+			q.load();
+
+			 
+			
+			
+			return;
 			_silentMode = true;
 			_isStarted = false;
 			_isDebugEnable = true;
@@ -82,7 +142,7 @@
 			preloader_mc.alpha = 1;
 		}
 
-		
+/*		
 		private function startLoaderMaxXML(): void {
 			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
 			var xmlLoader: XMLLoader = new XMLLoader("xml/videoList.xml", {
@@ -541,5 +601,6 @@
 			}
 			showVideo(_videos[prev]);
 		}
+		*/
 	}
 }
