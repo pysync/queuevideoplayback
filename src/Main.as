@@ -12,13 +12,24 @@
 	import flash.geom.Rectangle;
 	import flash.display.Sprite;
 	import com.greensock.loading.ImageLoader;
+	import flash.net.URLLoader;
+	import flash.errors.IOError;
+	import flash.events.IOErrorEvent;
+	import flash.net.URLRequest;
+	import fl.containers.ScrollPane;
+	import flash.geom.ColorTransform;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import com.greensock.loading.display.ContentDisplay;
+	import flash.display.DisplayObject;
+	import flash.utils.Dictionary;
 	
 
 	
 	public class Main extends MovieClip {
 		
 		// data
-		private var _videoData: Array = [
+		public var _videoData: Array = [
 			{ url:"movie14.mp4", vars: {name:"V_0", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
 			{ url:"movie21.mp4", vars: {name:"V_1", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
 			{ url:"movie30.mp4", vars: {name:"V_2", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
@@ -26,57 +37,8 @@
 			{ url:"movie34.mp4", vars: {name:"V_4", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
 			{ url:"movie35.mp4", vars: {name:"V_5", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
 		];
-		
-		private var _videoPrependURLs = "assets/";  
-		
-		private var _trackData: Array = [
-			{ url: "music01.mp3", vars: {name:"T_0", autoPlay:false, repeat:-1} }
-		];  
-		
-		private var _trackPrependURLs = "assets/";                               
-		
-		//an array containing the VideoLoaders in the order they should be played
-		private var _videos: Array = [];
-
-		//an array containing the Mp3Loaders in the order they should be played
-		private var _tracks: Array = [];
-
-		//keeps track of the VideoLoader that is currently playing
-		private var _currentVideo: VideoLoader;
-
-		// keeps track of the Mp3Loader that is currently playing
-		private var _currentTrack: MP3Loader;
-
-		// keeps track selected sound index
-		private var _trackIndex: int;
-
-		//if true, the mouse is over the video or UI controls
-		private var _mouseIsOver: Boolean;
-
-		//If true, the audio has been muted
-		private var _silentMode: Boolean;
-
-		//If true, the background music há been muted
-		private var _silentModeBG: Boolean;
-
-		//where is play started
-		private var _isStarted: Boolean
-
-		//tracks whether or not the video was paused when the user moused-down on the scrubber. We must pause for scrubbing, but this tells us whether or not to playVideo() when the user releases the mouse. 
-		private var _preScrubPaused: Boolean;
-
-		//DEBUG FLAG
-		private var _isDebugEnable: Boolean;
-
-
-
-		 
-		 //when the image loads, fade it in from alpha:0 using TweenLite
-		 function onImageLoad(event:LoaderEvent):void {
-			 
-		 }
-	
-		private var _thumbs:Array = [
+				
+		public var _thumbs:Array = [
 			"http://vignette2.wikia.nocookie.net/swordartonline/images/e/ee/Yui.png/revision/latest/scale-to-width-down/275?cb=20140228061052",
 			"http://vignette4.wikia.nocookie.net/swordartonline/images/a/a9/Sao-kirito-asuna-yui-family.png/revision/latest/scale-to-width-down/212?cb=20150705222747",
 			"http://vignette2.wikia.nocookie.net/swordartonline/images/6/6b/LS_Concert_Event.png/revision/latest/scale-to-width-down/212?cb=20150611103807",
@@ -87,46 +49,68 @@
 			"http://vignette4.wikia.nocookie.net/swordartonline/images/4/4c/LS_Sumeragi_vs_Kirito.png/revision/latest/scale-to-width-down/212?cb=20150610190729",
 			"http://vignette2.wikia.nocookie.net/swordartonline/images/c/ca/LS_Aftermath.png/revision/latest/scale-to-width-down/212?cb=20150610193123"
 		];
-		public function Main() {
-			
-			var p:MovieClip = availableMovieListPanel;
-			p.removeChildren(0);
-			
-			var q:LoaderMax = new LoaderMax();
-			
-			for(var i = 0; i < 3; i++) {
-				for (var j = 0; j < 3; j ++){
-					
-					var index = (i * 3) + j;
-					var v:VideoItem = new VideoItem();
-					v.x = 100 + j * 150;
-					v.y = 50 + i * 100;
-					p.addChild(v);
-					v.titleText.text = "Video: [" + index + "]";
-					
-					 //create an ImageLoader:
-					 var loader:ImageLoader = new ImageLoader(_thumbs[index], 
-								{
-									name:"thumb01", 
-									container:v.thumbnail,
-									x:0, y:0, 
-									width:120, 
-									height:68, 
-									scaleMode:"proportionalInside",
-									centerRegistration:true, 
-									onComplete:onImageLoad
-								});
-				 
-					q.append(loader);
-								
-				}
-			}
-			q.load();
+		
+		public var _hostName = "http://localhost:5000";
+		public var _todayMovieAPi = "http://localhost:5000/api/movies";
+		public var defaultThumb = "http://localhost:5000/assets/default_thumb.png";
+				
+		// keep track last loaded url list data
+		public var urlDataList:Object = [];
 
-			 
+		// keep track current video in queue
+		public var movieInQueue:Array = new Array();
+		
+		public var _videoPrependURLs = "assets/";  
+		
+		public var _trackData: Array = [
+			{ url: "music01.mp3", vars: {name:"T_0", autoPlay:false, repeat:-1} }
+		];  
 			
+		public var _trackPrependURLs = "assets/";                               
+		
+		//an array containing the VideoLoaders in the order they should be played
+		public var _videos: Array = [];
+
+		//an array containing the Mp3Loaders in the order they should be played
+		public var _tracks: Array = [];
+
+		//keeps track of the VideoLoader that is currently playing
+		public var _currentVideo: VideoLoader;
+
+		// keeps track of the Mp3Loader that is currently playing
+		public var _currentTrack: MP3Loader;
+
+		// keeps track selected sound index
+		public var _trackIndex: int;
+
+		//if true, the mouse is over the video or UI controls
+		public var _mouseIsOver: Boolean;
+
+		//If true, the audio has been muted
+		public var _silentMode: Boolean;
+
+		//If true, the background music há been muted
+		public var _silentModeBG: Boolean;
+
+		//where is play started
+		public var _isStarted: Boolean
+
+		//tracks whether or not the video was paused when the user moused-down on the scrubber. We must pause for scrubbing, but this tells us whether or not to playVideo() when the user releases the mouse. 
+		public var _preScrubPaused: Boolean;
+
+		//DEBUG FLAG
+		public var _isDebugEnable: Boolean;
+
+	
+		public function Main() {
+
 			
+			loadTodayMovieUrlList();
+			
+			// clear UI - !importance!
+			queueMovieListPanel.removeChildren(0);
 			return;
+			
 			_silentMode = true;
 			_isStarted = false;
 			_isDebugEnable = true;
@@ -142,8 +126,97 @@
 			preloader_mc.alpha = 1;
 		}
 
+		// ============================================ I: Loading Data List Use for build Available Movie List =================================
+		
+		// - entry point will fire event process
+		public function loadTodayMovieUrlList(): void {
+			var _jsonLoader:URLLoader = new URLLoader();
+			_jsonLoader.load(new URLRequest(_todayMovieAPi));
+			_jsonLoader.addEventListener(Event.COMPLETE, onTodayMovieUrlLoaded);
+			_jsonLoader.addEventListener(IOErrorEvent.IO_ERROR, onTodayMovieUrlLoadError);
+		} 
+		
+		// TODO: notify to user to retry load
+		public function onTodayMovieUrlLoadError(e:IOErrorEvent):void {
+			
+			trace("processTodayMovieLoadError: " + e);
+			e.target.removeEventListener(IOErrorEvent.IO_ERROR, onTodayMovieUrlLoadError);
+		}
+		
+		// - process loaded url data and setup available movie list
+		// - store loaded url data movie list
+		
+		// TODO: fix for match data type in response of api 
+		public function onTodayMovieUrlLoaded(e:Event):void {
+			
+			var rawJson:String = e.target.data;
+			//trace(rawJson);
+			
+			urlDataList = JSON.parse(rawJson);
+			//trace(urlList);
+			
+			// in this example, response is array!
+			if (urlDataList && urlDataList.length > 0 ){
+				//trace("response data list have length: " + urlList.length);
+				setupListMoviePanel();
+			}
+			else {
+				// TODO: handler when cannot parse data
+			}
+		}
+		
+		// setup list of available movies & set hanler action:
+		// 1: play preview movie
+		// 2: add movie to queue
+		// 3: scroll to load more movie
+		
+		public function setupListMoviePanel():void {
+		
+			var columns:int = 3;
+			var rows:int = int(urlDataList.length / columns);
+			var alignX = 100;
+			var alignY = 50;
+			var thumbW = 140;
+			var thumbH = 100;
+
+			var contentHeight = rows * (thumbH + alignY);
+			var contentWidth = columns * thumbW;
+			
+			var listContent:MovieClip = new MovieClip();
+			listContent.graphics.beginFill(0xFFFFFF, 1);
+			listContent.graphics.drawRect(0, 0, contentWidth, contentHeight); 
+            listContent.graphics.endFill();  
+			listContent.x = listContent.y = 0;
+			
+			listMoviePanel.listPanel.source = listContent;
+			var queue:LoaderMax = new LoaderMax();
+			
+			for(var i:int = 0; i < urlDataList.length; i++) {
+				
+				var video:VideoItem = new VideoItem(this, i);
+				video.x = alignX + (i % columns) * thumbW;
+				video.y = alignY + int(i / columns) * thumbH;
+				listContent.addChild(video);
+				queue.append(video.createThumbImageLoader());
+			}
+			queue.load();
+		}
+		
+		//Utils function
+		public function force2Digits(value: Number): String {
+			return (value < 10) ? "0" + String(value) : String(value);
+		}
+		
+		//Utils function
+		public function dragEffect():void {
+			var newColor:ColorTransform = new ColorTransform();
+			newColor.color = 0xFF0000;
+			dragFrameSlot.border.transform.colorTransform = newColor;
+		}
+
+
 /*		
-		private function startLoaderMaxXML(): void {
+		public function startLoaderMaxXML(): void {
 			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
 			var xmlLoader: XMLLoader = new XMLLoader("xml/videoList.xml", {
 				name: "videoList",
@@ -152,7 +225,7 @@
 			xmlLoader.load();
 		}
 		
-		private function startTrackLoaderMax(): void {
+		public function startTrackLoaderMax(): void {
 			var trackQueue:LoaderMax = new LoaderMax({
 				name: "trackDataList",
 				maxConnections:1,
@@ -172,7 +245,7 @@
 			_tracks = trackQueue.getChildren();
 		}
 		
-		private function startVideoLoaderMax(): void {
+		public function startVideoLoaderMax(): void {
 			var videoQueue:LoaderMax = new LoaderMax({
 				name: "videoDataList",
 				maxConnections:1,
@@ -190,43 +263,43 @@
 			_videos = videoQueue.getChildren();
 		}	
 		
-		private function trackLoaderProgressHandler(event:LoaderEvent):void {
+		public function trackLoaderProgressHandler(event:LoaderEvent):void {
 			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
 						
 		}
 		
-		private function trackLoaderCompleteHandler(event:LoaderEvent): void {
+		public function trackLoaderCompleteHandler(event:LoaderEvent): void {
 			preloader_mc.totalPercent_mc.text = "Total: DONE!";
 			
 			showVideo(_videos[0]);
 		}
 		
-		private function childTrackLoaderProgressHandler(event:LoaderEvent): void {
+		public function childTrackLoaderProgressHandler(event:LoaderEvent): void {
 			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
 		}
 		
-		private function childTrackLoaderCompleteHandler(event:LoaderEvent): void {
+		public function childTrackLoaderCompleteHandler(event:LoaderEvent): void {
 			preloader_mc.childPercent_mc.text = "Child: DONE!"
 		}
 
-		private function videoLoaderProgressHandler(event:LoaderEvent):void {
+		public function videoLoaderProgressHandler(event:LoaderEvent):void {
 			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
 						
 		}
 		
-		private function videoLoaderCompleteHandler(event:LoaderEvent): void {
+		public function videoLoaderCompleteHandler(event:LoaderEvent): void {
 			preloader_mc.totalPercent_mc.text = "Total: DONE!";
 		}
 		
-		private function childVideoLoaderProgressHandler(event:LoaderEvent): void {
+		public function childVideoLoaderProgressHandler(event:LoaderEvent): void {
 			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
 		}
 		
-		private function childVideoLoaderCompleteHandler(event:LoaderEvent): void {
+		public function childVideoLoaderCompleteHandler(event:LoaderEvent): void {
 			preloader_mc.childPercent_mc.text = "Child: DONE!"
 		}
 
-		private function xmlHandler(event: LoaderEvent): void {
+		public function xmlHandler(event: LoaderEvent): void {
 
 			var trackQueue: LoaderMax = LoaderMax.getLoader("trackListLoader");
 			_tracks = trackQueue.getChildren();
@@ -245,13 +318,13 @@
 			showVideo(_videos[0]);
 		}
 
-		private function getSelectedTrack(): MP3Loader {
+		public function getSelectedTrack(): MP3Loader {
 			if (_trackIndex >= 0 && _trackIndex < _tracks.length)
 				return _tracks[_trackIndex];
 			return _tracks[0];
 		}
 
-		private function showVideo(video: VideoLoader): void {
+		public function showVideo(video: VideoLoader): void {
 
 			//if the new video is the one that's currently showing, do nothing.
 			if (video == _currentVideo) {
@@ -372,7 +445,7 @@
 			updateMonitor();
 		}
 
-		private function initMonitor(): void {
+		public function initMonitor(): void {
 			if (!_isDebugEnable)
 				return;
 
@@ -383,7 +456,7 @@
 			monitor_mc.trackId_mc.text = "track: --";
 		}
 
-		private function updateMonitor(): void {
+		public function updateMonitor(): void {
 			if (!_isDebugEnable)
 				return;
 
@@ -394,7 +467,7 @@
 			monitor_mc.trackId_mc.text = "track: " + trackIndex;
 		}
 
-		private function initUI(): void {
+		public function initUI(): void {
 
 			//ignore mouse interaction with progressBar_mc so that clicks pass through to the loadingBar_mc whose listener handles skipping the video to that spot.
 			controlUI_mc.progressBar_mc.mouseEnabled = false;
@@ -415,29 +488,27 @@
 			});
 		}
 
-		private function addListeners(objects: Array, type: String, func: Function): void {
+		public function addListeners(objects: Array, type: String, func: Function): void {
 			var i: int = objects.length;
 			while (i--) {
 				objects[i].addEventListener(type, func);
 			}
 		}
 
-		private function updateDownloadProgress(event: LoaderEvent = null): void {
+		public function updateDownloadProgress(event: LoaderEvent = null): void {
 			controlUI_mc.loadingBar_mc.scaleX = _currentVideo.progress;
 		}
 
-		private function bufferFullHandler(event: LoaderEvent): void {
+		public function bufferFullHandler(event: LoaderEvent): void {
 			TweenMax.to(preloader_mc, 0.3, {
 				autoAlpha: 0,
 				onComplete: preloader_mc.stop
 			});
 		}
 
-		private function force2Digits(value: Number): String {
-			return (value < 10) ? "0" + String(value) : String(value);
-		}
 
-		private function updatePlayProgress(event: LoaderEvent = null): void {
+
+		public function updatePlayProgress(event: LoaderEvent = null): void {
 			var time: Number = _currentVideo.videoTime;
 			var minutes: String = force2Digits(int(time / 60));
 			var seconds: String = force2Digits(int(time % 60));
@@ -447,13 +518,13 @@
 
 		}
 
-		private function refreshTotalTime(event: LoaderEvent = null): void {
+		public function refreshTotalTime(event: LoaderEvent = null): void {
 			var minutes: String = force2Digits(int(_currentVideo.duration / 60));
 			var seconds: String = force2Digits(int(_currentVideo.duration % 60));
 			controlUI_mc.totalTime_tf.text = minutes + ":" + seconds;
 		}
 
-		private function activateUI(): void {
+		public function activateUI(): void {
 
 			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OVER, toggleControlUI);
 			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OUT, toggleControlUI);
@@ -482,23 +553,23 @@
 			controlUI_mc.playPauseButton_mc.addEventListener(MouseEvent.ROLL_OUT, shrinkPlayPause);
 		}
 		
-		private function blackRollOverHandler(event:MouseEvent):void {
+		public function blackRollOverHandler(event:MouseEvent):void {
 		    //TweenMax.to(event.target.label, 0.3, {tint:0xFFFFFF});
 		}
 
-		private function blackRollOutHandler(event:MouseEvent):void {
+		public function blackRollOutHandler(event:MouseEvent):void {
 		    //TweenMax.to(event.target.label, 0.3, {tint:null});
 		}
 		
-		private function growPlayPause(event:MouseEvent):void {
+		public function growPlayPause(event:MouseEvent):void {
 		    TweenMax.to(event.target, 0.2, {scaleX:1.3, scaleY:1.3});
 		}
 
-		private function shrinkPlayPause(event:MouseEvent):void {
+		public function shrinkPlayPause(event:MouseEvent):void {
 		    TweenMax.to(event.target, 0.2, {scaleX:1, scaleY:1});
 		}
 
-		private function mouseDownScrubber(event: MouseEvent): void {
+		public function mouseDownScrubber(event: MouseEvent): void {
 			_preScrubPaused = _currentVideo.videoPaused;
 			_currentVideo.videoPaused = true;
 			controlUI_mc.scrubber_mc.startDrag(false, new Rectangle(controlUI_mc.loadingBar_mc.x, controlUI_mc.loadingBar_mc.y, controlUI_mc.loadingBar_mc.width, 0));
@@ -506,19 +577,19 @@
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, scrubToMouse);
 		}
 
-		private function scrubToMouse(event: MouseEvent): void {
+		public function scrubToMouse(event: MouseEvent): void {
 			controlUI_mc.progressBar_mc.width = controlUI_mc.mouseX - controlUI_mc.progressBar_mc.x;
 			_currentVideo.playProgress = controlUI_mc.progressBar_mc.scaleX;
 		}
 
-		private function mouseUpScrubber(event: MouseEvent): void {
+		public function mouseUpScrubber(event: MouseEvent): void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpScrubber);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, scrubToMouse);
 			controlUI_mc.scrubber_mc.stopDrag();
 			_currentVideo.videoPaused = _preScrubPaused;
 		}
 
-		private function toggleControlUI(event: MouseEvent): void {
+		public function toggleControlUI(event: MouseEvent): void {
 			_mouseIsOver = !_mouseIsOver;
 			if (_mouseIsOver) {
 				TweenMax.to(controlUI_mc, 0.3, {
@@ -531,7 +602,7 @@
 			}
 		}
 
-		private function toggleAudio(event: MouseEvent): void {
+		public function toggleAudio(event: MouseEvent): void {
 			_silentMode = !_silentMode;
 			if (_silentMode) {
 				_currentVideo.volume = 0;
@@ -542,7 +613,7 @@
 			}
 		}
 
-		private function toggleBGSoundTrack(event: MouseEvent): void {
+		public function toggleBGSoundTrack(event: MouseEvent): void {
 			_silentModeBG = !_silentModeBG;
 			if (_silentModeBG) {
 				_currentTrack.volume = 0;
@@ -551,7 +622,7 @@
 			}
 		}
 
-		private function togglePlayPause(event: MouseEvent = null): void {
+		public function togglePlayPause(event: MouseEvent = null): void {
 			_currentVideo.videoPaused = !_currentVideo.videoPaused;
 			if (_currentVideo.videoPaused) {
 				TweenMax.to(playPauseBigButton_mc, 0.3, {
@@ -586,7 +657,7 @@
 			}
 		}
 
-		private function nextVideo(event: Event): void {
+		public function nextVideo(event: Event): void {
 			var next: int = _videos.indexOf(_currentVideo) + 1;
 			if (next >= _videos.length) {
 				next = 0;
@@ -594,7 +665,7 @@
 			showVideo(_videos[next]);
 		}
 
-		private function previousVideo(event: Event): void {
+		public function previousVideo(event: Event): void {
 			var prev: int = _videos.indexOf(_currentVideo) - 1;
 			if (prev < 0) {
 				prev = _videos.length - 1;

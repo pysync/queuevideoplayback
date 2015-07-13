@@ -91,7 +91,107 @@ app.get('/api/movies', function(res, res){
 		}
 	];
 	
-	res.json(d);
+    var l = [
+      
+
+		{ 
+			url: '', 
+			title: '心の温度', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '黒と白の剣舞', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '青眼の悪魔', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '紅の殺意', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '朝露の少女', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: 'ユイの心', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '奈落の淵', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '世界の終焉', 
+			thumb: ''
+		},
+         
+
+		{ 
+			url: '', 
+			title: '心の温度', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '黒と白の剣舞', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '青眼の悪魔', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '紅の殺意', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '朝露の少女', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: 'ユイの心', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '奈落の淵', 
+			thumb: ''
+		},
+		
+		{ 
+			url: '', 
+			title: '世界の終焉', 
+			thumb: ''
+		}
+    ];
+    res.json(d);
 });
 
 app.listen(app.get('port'), function() {
