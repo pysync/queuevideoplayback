@@ -30,12 +30,12 @@
 		
 		// data
 		public var _videoData: Array = [
-			{ url:"movie14.mp4", vars: {name:"V_0", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
-			{ url:"movie21.mp4", vars: {name:"V_1", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
-			{ url:"movie30.mp4", vars: {name:"V_2", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-			{ url:"movie32.mp4", vars: {name:"V_3", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-			{ url:"movie34.mp4", vars: {name:"V_4", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
-			{ url:"movie35.mp4", vars: {name:"V_5", width:480,height:320, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
+			{ url:"movie14.mp4", vars: {name:"V_0", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false , estimatedBytes:"8887418" }},
+			{ url:"movie21.mp4", vars: {name:"V_1", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"14602065"}},
+			{ url:"movie30.mp4", vars: {name:"V_2", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie32.mp4", vars: {name:"V_3", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie34.mp4", vars: {name:"V_4", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}},
+			{ url:"movie35.mp4", vars: {name:"V_5", width:320,height:240, scaleMode:"proportionalInside", centerRegistration:true, alpha:1 , autoPlay:false,  estimatedBytes:"37803458"}}
 		];
 				
 		public var _thumbs:Array = [
@@ -62,8 +62,10 @@
 		
 		public var _videoPrependURLs = "assets/";  
 		
-		public var _trackData: Array = [
-			{ url: "music01.mp3", vars: {name:"T_0", autoPlay:false, repeat:-1} }
+		public var trackData: Array = [
+			{ url: "music01.mp3", title: "Hello world", vars: {name:"T_0", autoPlay:false, repeat:-1} },
+			{ url: "music01.mp3", title: "What You Are", vars: {name:"T_1", autoPlay:false, repeat:-1} },
+			{ url: "music01.mp3", title: "By your coll", vars: {name:"T_1", autoPlay:false, repeat:-1} }
 		];  
 			
 		public var _trackPrependURLs = "assets/";                               
@@ -107,9 +109,10 @@
 			
 			loadTodayMovieUrlList();
 			
+			
 			// clear UI - !importance!
 			queueMovieListPanel.removeChildren(0);
-			return;
+			queueMusicListPanel.setup(this);
 			
 			_silentMode = true;
 			_isStarted = false;
@@ -123,7 +126,7 @@
 			startTrackLoaderMax();
 			startVideoLoaderMax();
 			
-			preloader_mc.alpha = 1;
+			loadingAnim.alpha = 1;
 		}
 
 		// ============================================ I: Loading Data List Use for build Available Movie List =================================
@@ -215,7 +218,7 @@
 		}
 
 
-/*		
+		
 		public function startLoaderMaxXML(): void {
 			LoaderMax.activate([XMLLoader, VideoLoader, MP3Loader]);
 			var xmlLoader: XMLLoader = new XMLLoader("xml/videoList.xml", {
@@ -236,8 +239,8 @@
 			});
 
 			
-			for(var i = 0; i < _trackData.length; i++) {
-				trackQueue.append(new MP3Loader(_trackData[i].url, _trackData[i].vars))
+			for(var i = 0; i < trackData.length; i++) {
+				trackQueue.append(new MP3Loader(trackData[i].url, trackData[i].vars))
 			}
 			
 			trackQueue.prependURLs("assets/");
@@ -264,39 +267,39 @@
 		}	
 		
 		public function trackLoaderProgressHandler(event:LoaderEvent):void {
-			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
+			loadingAnim.totalPercentText.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
 						
 		}
 		
 		public function trackLoaderCompleteHandler(event:LoaderEvent): void {
-			preloader_mc.totalPercent_mc.text = "Total: DONE!";
+			loadingAnim.totalPercentText.text = "Total: DONE!";
 			
 			showVideo(_videos[0]);
 		}
 		
 		public function childTrackLoaderProgressHandler(event:LoaderEvent): void {
-			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
+			loadingAnim.childPercentText.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
 		}
 		
 		public function childTrackLoaderCompleteHandler(event:LoaderEvent): void {
-			preloader_mc.childPercent_mc.text = "Child: DONE!"
+			loadingAnim.childPercentText.text = "Child: DONE!"
 		}
 
 		public function videoLoaderProgressHandler(event:LoaderEvent):void {
-			preloader_mc.totalPercent_mc.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
+			loadingAnim.totalPercentText.text = "Total: " +  Math.round(event.target.progress * 100).toString() + " %";
 						
 		}
 		
 		public function videoLoaderCompleteHandler(event:LoaderEvent): void {
-			preloader_mc.totalPercent_mc.text = "Total: DONE!";
+			loadingAnim.totalPercentText.text = "Total: DONE!";
 		}
 		
 		public function childVideoLoaderProgressHandler(event:LoaderEvent): void {
-			preloader_mc.childPercent_mc.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
+			loadingAnim.childPercentText.text = "Child: " +  Math.round(event.target.progress * 100).toString() + " %";
 		}
 		
 		public function childVideoLoaderCompleteHandler(event:LoaderEvent): void {
-			preloader_mc.childPercent_mc.text = "Child: DONE!"
+			loadingAnim.childPercentText.text = "Child: DONE!"
 		}
 
 		public function xmlHandler(event: LoaderEvent): void {
@@ -349,9 +352,9 @@
 				}
 
 				//fade out the preloader and then stop() it. If the new video needs to display the preloader, that's okay because the fade-in tween we create later will overwrite this one.
-				TweenMax.to(preloader_mc, 0.3, {
+				TweenMax.to(loadingAnim, 0.3, {
 					autoAlpha: 0,
-					onComplete: preloader_mc.stop
+					onComplete: loadingAnim.stop
 				});
 
 				//fade the current (old) video's alpha out. Remember the VideoLoader's "content" refers to the ContentDisplay Sprite we see on the screen.
@@ -369,13 +372,13 @@
 			//now swap the _currentLoader variable so it refers to the new video.
 			_currentVideo = video;
 
-			//listen for PROGRESS events so that we can update the loadingBar_mc's scaleX accordingly
+			//listen for PROGRESS events so that we can update the currentLoadingBar's scaleX accordingly
 			_currentVideo.addEventListener(LoaderEvent.PROGRESS, updateDownloadProgress);
 
 			//listen for a VIDEO_COMPLETE event so that we can automatically advance to the next video.
 			_currentVideo.addEventListener(VideoLoader.VIDEO_COMPLETE, nextVideo);
 
-			//listen for PLAY_PROGRESS events so that we can update the progressBar_mc's scaleX accordingly
+			//listen for PLAY_PROGRESS events so that we can update the currentProgressBar's scaleX accordingly
 			_currentVideo.addEventListener(VideoLoader.PLAY_PROGRESS, updatePlayProgress);
 
 			//if the video hasn't fully loaded yet and is still buffering, show the preloader
@@ -388,8 +391,8 @@
 				_currentVideo.prioritize(true);
 
 				//play() the preloader and fade its alpha up.
-				preloader_mc.play();
-				TweenMax.to(preloader_mc, 0.3, {
+				loadingAnim.play();
+				TweenMax.to(loadingAnim, 0.3, {
 					autoAlpha: 1
 				});
 			}
@@ -422,7 +425,7 @@
 			}
 
 			//when we addChild() the VideoLoader's content, it makes it rise to the top of the stacking order
-			videoContainer_mc.addChild(_currentVideo.content);
+			videoContainer.addChild(_currentVideo.content);
 
 			//fade the VideoLoader's content alpha in. Remember, the "content" refers to the ContentDisplay Sprite that we see on the stage.
 			TweenMax.to(_currentVideo.content, 0.8, {
@@ -437,7 +440,7 @@
 				_currentVideo.addEventListener(LoaderEvent.INIT, refreshTotalTime);
 			}
 
-			//update the progressBar_mc and loadingBar_mc
+			//update the currentProgressBar and currentLoadingBar
 			updateDownloadProgress();
 			updatePlayProgress();
             
@@ -452,8 +455,8 @@
 			var videoIndex = _videos.indexOf(_currentVideo);
 			var trackIndex = _tracks.indexOf(_currentTrack);
 
-			monitor_mc.videoId_mc.text = "scene: --";
-			monitor_mc.trackId_mc.text = "track: --";
+			debugger.videoIdText.text = "scene: --";
+			debugger.trackIdText.text = "track: --";
 		}
 
 		public function updateMonitor(): void {
@@ -463,27 +466,27 @@
 			var videoIndex = _videos.indexOf(_currentVideo);
 			var trackIndex = _tracks.indexOf(_currentTrack);
 
-			monitor_mc.videoId_mc.text = "scene: " + videoIndex;
-			monitor_mc.trackId_mc.text = "track: " + trackIndex;
+			debugger.videoIdText.text = "scene: " + videoIndex;
+			debugger.trackIdText.text = "track: " + trackIndex;
 		}
 
 		public function initUI(): void {
 
-			//ignore mouse interaction with progressBar_mc so that clicks pass through to the loadingBar_mc whose listener handles skipping the video to that spot.
-			controlUI_mc.progressBar_mc.mouseEnabled = false;
+			//ignore mouse interaction with currentProgressBar so that clicks pass through to the currentLoadingBar whose listener handles skipping the video to that spot.
+			controlBar.currentProgressBar.mouseEnabled = false;
 
-			//ignore mouse interaction with preloader_mc
-			preloader_mc.mouseEnabled = false;
+			//ignore mouse interaction with loadingAnim
+			loadingAnim.mouseEnabled = false;
 
 			//the "layer" blendMode makes the alpha fades cleaner (overlapping objects don't add alpha levels)
-			controlUI_mc.blendMode = "layer";
+			controlBar.blendMode = "layer";
 
 			//set the progress and loading bars and the scrubber to the very beginning
-			controlUI_mc.progressBar_mc.width = controlUI_mc.loadingBar_mc.width = 0;
-			controlUI_mc.scrubber_mc.x = controlUI_mc.progressBar_mc.x;
+			controlBar.currentProgressBar.width = controlBar.currentLoadingBar.width = 0;
+			controlBar.seekTimeAnchor.x = controlBar.currentProgressBar.x;
 
 			//initially hide the user interface - autoAlpha:0 sets alpha to 0 and visible to false.
-			TweenMax.allTo([controlUI_mc, playPauseBigButton_mc, preloader_mc], 0, {
+			TweenMax.allTo([controlBar, playLargeButton, loadingAnim], 0, {
 				autoAlpha: 0
 			});
 		}
@@ -496,13 +499,13 @@
 		}
 
 		public function updateDownloadProgress(event: LoaderEvent = null): void {
-			controlUI_mc.loadingBar_mc.scaleX = _currentVideo.progress;
+			controlBar.currentLoadingBar.scaleX = _currentVideo.progress;
 		}
 
 		public function bufferFullHandler(event: LoaderEvent): void {
-			TweenMax.to(preloader_mc, 0.3, {
+			TweenMax.to(loadingAnim, 0.3, {
 				autoAlpha: 0,
-				onComplete: preloader_mc.stop
+				onComplete: loadingAnim.stop
 			});
 		}
 
@@ -512,45 +515,45 @@
 			var time: Number = _currentVideo.videoTime;
 			var minutes: String = force2Digits(int(time / 60));
 			var seconds: String = force2Digits(int(time % 60));
-			controlUI_mc.currentTime_tf.text = minutes + ":" + seconds;
-			controlUI_mc.progressBar_mc.scaleX = _currentVideo.playProgress;
-			controlUI_mc.scrubber_mc.x = controlUI_mc.progressBar_mc.x + controlUI_mc.progressBar_mc.width;
+			controlBar.currentTimeText.text = minutes + ":" + seconds;
+			controlBar.currentProgressBar.scaleX = _currentVideo.playProgress;
+			controlBar.seekTimeAnchor.x = controlBar.currentProgressBar.x + controlBar.currentProgressBar.width;
 
 		}
 
 		public function refreshTotalTime(event: LoaderEvent = null): void {
 			var minutes: String = force2Digits(int(_currentVideo.duration / 60));
 			var seconds: String = force2Digits(int(_currentVideo.duration % 60));
-			controlUI_mc.totalTime_tf.text = minutes + ":" + seconds;
+			controlBar.totalTimeText.text = minutes + ":" + seconds;
 		}
 
 		public function activateUI(): void {
 
-			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OVER, toggleControlUI);
-			addListeners([controlUI_mc, videoContainer_mc, playPauseBigButton_mc], MouseEvent.ROLL_OUT, toggleControlUI);
-			addListeners([controlUI_mc.playPauseButton_mc, playPauseBigButton_mc, videoContainer_mc], MouseEvent.CLICK, togglePlayPause);
-			controlUI_mc.scrubber_mc.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownScrubber);
-			controlUI_mc.loadingBar_mc.addEventListener(MouseEvent.CLICK, scrubToMouse);
-			controlUI_mc.audio_mc.addEventListener(MouseEvent.CLICK, toggleAudio);
-			controlUI_mc.next_mc.addEventListener(MouseEvent.CLICK, nextVideo);
-			controlUI_mc.back_mc.addEventListener(MouseEvent.CLICK, previousVideo);
+			addListeners([controlBar, videoContainer, playLargeButton], MouseEvent.ROLL_OVER, toggleControlUI);
+			addListeners([controlBar, videoContainer, playLargeButton], MouseEvent.ROLL_OUT, toggleControlUI);
+			addListeners([controlBar.playButton, playLargeButton, videoContainer], MouseEvent.CLICK, togglePlayPause);
+			controlBar.seekTimeAnchor.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownScrubber);
+			controlBar.currentLoadingBar.addEventListener(MouseEvent.CLICK, scrubToMouse);
+			controlBar.soundButtonOn.addEventListener(MouseEvent.CLICK, toggleAudio);
+			controlBar.nextButton.addEventListener(MouseEvent.CLICK, nextVideo);
+			controlBar.previousButton.addEventListener(MouseEvent.CLICK, previousVideo);
 			
-			var controls:Array = [controlUI_mc.playPauseButton_mc, 
-								  playPauseBigButton_mc, 
-								  controlUI_mc.back_mc, 
-								  controlUI_mc.next_mc, 
-								  controlUI_mc.audio_mc, 
-								  controlUI_mc.scrubber_mc];
+			var controls:Array = [controlBar.playButton, 
+								  playLargeButton, 
+								  controlBar.previousButton, 
+								  controlBar.nextButton, 
+								  controlBar.soundButtonOn, 
+								  controlBar.seekTimeAnchor];
 			var i:int = controls.length;
 			while (i--) {
 			    //controls[i].buttonMode = true;
 			    //controls[i].mouseChildren = false;
 			}
 			
-			addListeners([controlUI_mc.back_mc, controlUI_mc.audio_mc, controlUI_mc.next_mc], MouseEvent.ROLL_OVER, blackRollOverHandler);
-			addListeners([controlUI_mc.back_mc, controlUI_mc.audio_mc, controlUI_mc.next_mc], MouseEvent.ROLL_OUT, blackRollOutHandler);
-			controlUI_mc.playPauseButton_mc.addEventListener(MouseEvent.ROLL_OVER, growPlayPause);
-			controlUI_mc.playPauseButton_mc.addEventListener(MouseEvent.ROLL_OUT, shrinkPlayPause);
+			addListeners([controlBar.previousButton, controlBar.soundButtonOn, controlBar.nextButton], MouseEvent.ROLL_OVER, blackRollOverHandler);
+			addListeners([controlBar.previousButton, controlBar.soundButtonOn, controlBar.nextButton], MouseEvent.ROLL_OUT, blackRollOutHandler);
+			controlBar.playButton.addEventListener(MouseEvent.ROLL_OVER, growPlayPause);
+			controlBar.playButton.addEventListener(MouseEvent.ROLL_OUT, shrinkPlayPause);
 		}
 		
 		public function blackRollOverHandler(event:MouseEvent):void {
@@ -572,31 +575,31 @@
 		public function mouseDownScrubber(event: MouseEvent): void {
 			_preScrubPaused = _currentVideo.videoPaused;
 			_currentVideo.videoPaused = true;
-			controlUI_mc.scrubber_mc.startDrag(false, new Rectangle(controlUI_mc.loadingBar_mc.x, controlUI_mc.loadingBar_mc.y, controlUI_mc.loadingBar_mc.width, 0));
+			controlBar.seekTimeAnchor.startDrag(false, new Rectangle(controlBar.currentLoadingBar.x, controlBar.currentLoadingBar.y, controlBar.currentLoadingBar.width, 0));
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpScrubber);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, scrubToMouse);
 		}
 
 		public function scrubToMouse(event: MouseEvent): void {
-			controlUI_mc.progressBar_mc.width = controlUI_mc.mouseX - controlUI_mc.progressBar_mc.x;
-			_currentVideo.playProgress = controlUI_mc.progressBar_mc.scaleX;
+			controlBar.currentProgressBar.width = controlBar.mouseX - controlBar.currentProgressBar.x;
+			_currentVideo.playProgress = controlBar.currentProgressBar.scaleX;
 		}
 
 		public function mouseUpScrubber(event: MouseEvent): void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpScrubber);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, scrubToMouse);
-			controlUI_mc.scrubber_mc.stopDrag();
+			controlBar.seekTimeAnchor.stopDrag();
 			_currentVideo.videoPaused = _preScrubPaused;
 		}
 
 		public function toggleControlUI(event: MouseEvent): void {
 			_mouseIsOver = !_mouseIsOver;
 			if (_mouseIsOver) {
-				TweenMax.to(controlUI_mc, 0.3, {
+				TweenMax.to(controlBar, 0.3, {
 					autoAlpha: 1
 				});
 			} else {
-				TweenMax.to(controlUI_mc, 0.3, {
+				TweenMax.to(controlBar, 0.3, {
 					autoAlpha: 0
 				});
 			}
@@ -606,10 +609,10 @@
 			_silentMode = !_silentMode;
 			if (_silentMode) {
 				_currentVideo.volume = 0;
-				//controlUI_mc.audio_mc.label.gotoAndStop("off");
+				//controlBar.audio_mc.label.gotoAndStop("off");
 			} else {
 				_currentVideo.volume = 1;
-				//controlUI_mc.audio_mc.label.gotoAndStop("on");
+				//controlBar.audio_mc.label.gotoAndStop("on");
 			}
 		}
 
@@ -625,11 +628,11 @@
 		public function togglePlayPause(event: MouseEvent = null): void {
 			_currentVideo.videoPaused = !_currentVideo.videoPaused;
 			if (_currentVideo.videoPaused) {
-				TweenMax.to(playPauseBigButton_mc, 0.3, {
+				TweenMax.to(playLargeButton, 0.3, {
 					autoAlpha: 1
 				});
-				//controlUI_mc.playPauseButton_mc.gotoAndStop("paused");
-				TweenMax.to(videoContainer_mc, 0.3, {
+				//controlBar.playPauseButton_mc.gotoAndStop("paused");
+				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 6,
 						blurY: 6
@@ -639,11 +642,11 @@
 					}
 				});
 			} else {
-				TweenMax.to(playPauseBigButton_mc, 0.3, {
+				TweenMax.to(playLargeButton, 0.3, {
 					autoAlpha: 0
 				});
-				//controlUI_mc.playPauseButton_mc.gotoAndStop("playing");
-				TweenMax.to(videoContainer_mc, 0.3, {
+				//controlBar.playPauseButton_mc.gotoAndStop("playing");
+				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 0,
 						blurY: 0,
@@ -672,6 +675,6 @@
 			}
 			showVideo(_videos[prev]);
 		}
-		*/
+		
 	}
 }
