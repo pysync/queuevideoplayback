@@ -7,7 +7,16 @@
 		<script type="text/javascript" src="swfobject.js"></script>
 		<script type="text/javascript">
 			
+			var soundUrl = "music01.mp3";
+			var movieUrls = [
+					"movie14.mp4",
+				  "movie30.mp4",
+				  "movie35.mp4"
+			];
 			var flashvars = {};
+			flashvars["soundUrl"] = soundUrl;
+			flashvars["movieUrls"] = JSON.stringify(movieUrls);
+			
 			var params = {};
 			var attributes = {};
 			

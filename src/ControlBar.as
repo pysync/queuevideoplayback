@@ -16,17 +16,17 @@
 		}
 		
 		public function setLoadingProgress(percent:Number):void {
-			currentLoadingBar.scaleX = percent;
+			
 		}
 		
 		public function setPlayingProgress(percent:Number):void {
-			currentProgressBar.scaleX = percent;
+			
 			setSeekTime(percent);
 		}
 		
 		public function setSeekTime(percent:Number):void {
-			var _x = percent * totalProgressBar.width;
-			seekTimeAnchor.x = _x;
+			
+			
 		}
 		
 		public function setPlay(isPlay:Boolean):void {
