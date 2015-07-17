@@ -7,36 +7,32 @@
 		
 		
 		public function ControlBar() {
-			
-			setPlay(false);
-			setMute(true);
-			
-			setLoadingProgress(0);
-			setPlayingProgress(0);
 		}
 		
-		public function setLoadingProgress(percent:Number):void {
-			
-		}
-		
-		public function setPlayingProgress(percent:Number):void {
-			
-			setSeekTime(percent);
-		}
-		
-		public function setSeekTime(percent:Number):void {
-			
-			
-		}
-		
-		public function setPlay(isPlay:Boolean):void {
-			playButton.visible = isPlay;
-			pauseButton.visible = !isPlay;
+		public function setPaused(isPaused:Boolean):void {
+			playPauseButton.playButton.visible = isPaused;
+			playPauseButton.pauseButton.visible = !isPaused;
 		}
 		
 		public function setMute(isMute:Boolean):void {
-			soundButtonOn.visible = !isMute;
-			soundButtonOff.visible = isMute;
+			audioToggleButton.soundButtonOn.visible = !isMute;
+			audioToggleButton.soundButtonOff.visible = isMute;
+		}
+		
+		public function setPlayProgress(time:Number):void {
+			var minutes: String = toTwoDigits(int(time / 60));
+			var seconds: String = toTwoDigits(int(time % 60));
+			currentTimeText.text = minutes + ":" + seconds;
+		}
+			
+		public function setTotalTime(duration:Number):void {
+			var minutes: String = toTwoDigits(int(duration / 60));
+			var seconds: String = toTwoDigits(int(duration % 60));
+			totalTimeText.text = minutes + ":" + seconds;	
+		}
+		
+		function toTwoDigits(value: Number): String {
+			return (value < 10) ? "0" + String(value) : String(value);
 		}
 	}
 	

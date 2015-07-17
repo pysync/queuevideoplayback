@@ -214,6 +214,7 @@
 
 			//start playing the video from its beginning
 			_video.gotoVideoTime(0, true);
+			controlBar.setPaused(false);
 
 			//always start with the volume at 0, and fade it up to 1 if necessary.
 			_video.volume = 0;
@@ -225,6 +226,7 @@
 				_track.gotoSoundTime(0, true);
 				
 				_track.volume = 0;
+				controlBar.setMute(_silentMode);
 				if (!_silentMode) {
 					TweenMax.to(_track, 0.8, {
 						volume: 1
@@ -273,6 +275,8 @@
 			TweenMax.allTo([controlBar, loadingAnim], 0, {
 				autoAlpha: 0
 			});
+			controlBar.setMute(_silentMode);
+			controlBar.setPaused(true);
 		}
 
 
@@ -288,24 +292,19 @@
 		}
 
 		function updatePlayProgress(event: LoaderEvent = null): void {
-			var time: Number = _video.videoTime;
-			var minutes: String = toTwoDigits(int(time / 60));
-			var seconds: String = toTwoDigits(int(time % 60));
-			controlBar.currentTimeText.text = minutes + ":" + seconds;
+			controlBar.setPlayProgress(_video.videoTime);
 		}
 
 		function refreshTotalTime(event: LoaderEvent = null): void {
-			var minutes: String = toTwoDigits(int(_video.duration / 60));
-			var seconds: String = toTwoDigits(int(_video.duration % 60));
-			controlBar.totalTimeText.text = minutes + ":" + seconds;
+			controlBar.setTotalTime(_video.duration);
 		}
 
 		function activateUI(): void {
 
 			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OVER, toggleControlUI);
 			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OUT, toggleControlUI);
-			addListeners([controlBar.playButton, videoContainer], MouseEvent.CLICK, togglePlayPause);
-			controlBar.soundButtonOn.addEventListener(MouseEvent.CLICK, toggleAudio);
+			addListeners([controlBar.playPauseButton, videoContainer], MouseEvent.CLICK, togglePlayPause);
+			controlBar.audioToggleButton.addEventListener(MouseEvent.CLICK, toggleAudio);
 			
 		}
 		
@@ -324,6 +323,7 @@
 
 		function toggleAudio(event: MouseEvent): void {
 			_silentMode = !_silentMode;
+			controlBar.setMute(_silentMode);
 			if (_silentMode) {
 				_track.volume = 0;
 			} else {
@@ -332,9 +332,12 @@
 		}
 
 		function togglePlayPause(event: MouseEvent = null): void {
+			
 			_video.videoPaused = !_video.videoPaused;
+			controlBar.setPaused(_video.videoPaused);
+			
 			if (_video.videoPaused) {
-
+				_track.soundPaused = true;
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 6,
@@ -345,7 +348,7 @@
 					}
 				});
 			} else {
-
+				_track.soundPaused = false;
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 0,
@@ -374,10 +377,6 @@
 				prev = _videos.length - 1;
 			}
 			showVideo(_videos[prev]);
-		}
-		
-		function toTwoDigits(value: Number): String {
-			return (value < 10) ? "0" + String(value) : String(value);
 		}
 	
 		function addListeners(objects: Array, type: String, func: Function): void {
