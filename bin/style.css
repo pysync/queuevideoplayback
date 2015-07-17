@@ -3,10 +3,10 @@ body {}
 
 #preview{
     width: 640px;
-    height: 433px;
+    height: 360px;
     position: absolute;
     top: 50%;
     left: 50%;
     margin-left: -320px;
-    margin-top: -220px;
+    margin-top: -180px;
 }
