@@ -45,11 +45,11 @@
 			_silentMode = false;
 			_isStarted = false;
 			_isDebugEnable = true;
+			_mouseIsOver = false;
 			stage.scaleMode = "noScale";
 			
 			initUI();
 			initMonitor();
-			activateUI();
 			startLoaderMax();
 		}
 		
@@ -63,8 +63,8 @@
 			
 			var urls:Array = params["movieUrls"] != undefined
 						   ? JSON.parse(params["movieUrls"]) as Array
-						   : ["movie14.mp4", "movie30.mp4",
-							  "movie35.mp4", "movie32.mp4"];
+						   : ["scene_0001.mp4", "scene_0002.mp4",
+							  "scene_0003.mp4", "scene_0004.mp4"];
 	
 			
 			_trackData = {
@@ -83,13 +83,13 @@
 				var vars:Object = {
 					name:"movie_" + i, 
 					width:640,
-					height:433, 
+					height:360, 
 					scaleMode:"proportionalInside", 
 					centerRegistration:true, 
 					alpha:1, 
 					volume:0,
 					autoPlay:false, 
-					estimatedBytes:"8887418" 
+					estimatedBytes:"654000"
 				};
 				
 				_videoData.push({
@@ -140,8 +140,7 @@
 
 	
 		function loaderProgressHandler(event:LoaderEvent):void {
-			var percent:int = Math.round(event.target.progress * 100);
-			loadingAnim.totalPercentText.text = percent.toString() + " %";
+			debugger.setTotalProgress(event.target.progress);
 						
 		}
 		
@@ -155,8 +154,7 @@
 		}
 		
 		function childLoaderProgressHandler(event:LoaderEvent): void {
-			var percent:int = Math.round(event.target.progress * 100);
-			loadingAnim.childPercentText.text = percent.toString() + " %";
+			debugger.setChildProgress(event.target.progress);
 		}
 		
 		function childLoaderCompleteHandler(event:LoaderEvent): void {
@@ -167,9 +165,12 @@
 			if (video == _video) {
 				return;
 			}
-
-			if (_video == null) {
+			
+			// The firstime
+			if (_video == null && !_isStarted) {
+				
 				activateUI(); 
+				
 			} else {
 
 				_video.removeEventListener(LoaderEvent.PROGRESS, updateDownloadProgress);
@@ -190,7 +191,7 @@
 				TweenMax.to(_video.content, 0.8, {
 					autoAlpha: 0
 				});
-
+				
 				_video.volume = 0;
 				
 			}
@@ -214,7 +215,7 @@
 
 			//start playing the video from its beginning
 			_video.gotoVideoTime(0, true);
-			controlBar.setPaused(false);
+			largePlayPauseButton.setPaused(false);
 
 			//always start with the volume at 0, and fade it up to 1 if necessary.
 			_video.volume = 0;
@@ -226,7 +227,7 @@
 				_track.gotoSoundTime(0, true);
 				
 				_track.volume = 0;
-				controlBar.setMute(_silentMode);
+				audioToggleButton.setMute(_silentMode);
 				if (!_silentMode) {
 					TweenMax.to(_track, 0.8, {
 						volume: 1
@@ -255,28 +256,27 @@
 		function initMonitor(): void {
 			if (!_isDebugEnable)
 				return;
-
-			var videoIndex = _videos.indexOf(_video);
-			debugger.videoIdText.text = "scene: --";
+			debugger.videoIdText.text = "--";
 		}
 
 		function updateMonitor(): void {
 			if (!_isDebugEnable)
 				return;
 
-			var videoIndex = _videos.indexOf(_video);
-			debugger.videoIdText.text = "scene: " + videoIndex;
+			var videoIndex = _videos.indexOf(_video) + 1;
+			debugger.videoIdText.text = videoIndex.toString();
 		}
 
 		function initUI(): void {
 			loadingAnim.mouseEnabled = false;
-			controlBar.blendMode = "layer";
+			audioToggleButton.blendMode = "layer";
+			largePlayPauseButton.blendMode = "layer";
 
-			TweenMax.allTo([controlBar, loadingAnim], 0, {
+			TweenMax.allTo([audioToggleButton, largePlayPauseButton, loadingAnim], 0, {
 				autoAlpha: 0
 			});
-			controlBar.setMute(_silentMode);
-			controlBar.setPaused(true);
+			audioToggleButton.setMute(_silentMode);
+			largePlayPauseButton.setPaused(true);
 		}
 
 
@@ -292,30 +292,32 @@
 		}
 
 		function updatePlayProgress(event: LoaderEvent = null): void {
-			controlBar.setPlayProgress(_video.videoTime);
+			debugger.setPlayProgress(_video.videoTime);
 		}
 
 		function refreshTotalTime(event: LoaderEvent = null): void {
-			controlBar.setTotalTime(_video.duration);
+			debugger.setTotalTime(_video.duration);
 		}
 
 		function activateUI(): void {
 
-			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OVER, toggleControlUI);
-			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OUT, toggleControlUI);
-			addListeners([controlBar.playPauseButton, videoContainer], MouseEvent.CLICK, togglePlayPause);
-			controlBar.audioToggleButton.addEventListener(MouseEvent.CLICK, toggleAudio);
+			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OVER, toggleControlUI);
+			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OUT, toggleControlUI);
+			
+			var butons = [largePlayPauseButton, videoContainer];
+			addListeners(butons, MouseEvent.CLICK, togglePlayPause);
+			audioToggleButton.addEventListener(MouseEvent.CLICK, toggleAudio);
 			
 		}
 		
 		function toggleControlUI(event: MouseEvent): void {
 			_mouseIsOver = !_mouseIsOver;
 			if (_mouseIsOver) {
-				TweenMax.to(controlBar, 0.3, {
+				TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.3, {
 					autoAlpha: 1
 				});
 			} else {
-				TweenMax.to(controlBar, 0.3, {
+				TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
 					autoAlpha: 0
 				});
 			}
@@ -323,21 +325,26 @@
 
 		function toggleAudio(event: MouseEvent): void {
 			_silentMode = !_silentMode;
-			controlBar.setMute(_silentMode);
+			audioToggleButton.setMute(_silentMode);
 			if (_silentMode) {
 				_track.volume = 0;
 			} else {
 				_track.volume = 1;
 			}
 		}
-
+		
 		function togglePlayPause(event: MouseEvent = null): void {
-			
+
 			_video.videoPaused = !_video.videoPaused;
-			controlBar.setPaused(_video.videoPaused);
+			largePlayPauseButton.setPaused(_video.videoPaused);
 			
 			if (_video.videoPaused) {
 				_track.soundPaused = true;
+				if (_mouseIsOver) {
+					TweenMax.to(largePlayPauseButton, 0.3, {
+						alpha: 1
+					});
+				}
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 6,
@@ -349,6 +356,11 @@
 				});
 			} else {
 				_track.soundPaused = false;
+				if (_mouseIsOver) {
+					TweenMax.to(largePlayPauseButton, 0.3, {
+						alpha: 0
+					});
+				}
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 0,
