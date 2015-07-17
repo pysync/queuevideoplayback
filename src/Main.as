@@ -27,6 +27,7 @@
 
 	
 	public class Main extends MovieClip {
+		
 		private var _trackData:Object = new Object();
 		public var _videoData: Array = [];
 		public var _videos: Array = [];
@@ -53,56 +54,49 @@
 		}
 		
 				
-		private function loadParameters():void {
-			var flashvars:Object = stage.loaderInfo.parameters;
+		function loadParameters():void {
+			var params:Object = stage.loaderInfo.parameters;
 
-			var parseSuccess:Boolean = false;
+			var soundUrl = params["soundUrl"] != undefined 
+						 ? params["soundUrl"] as String
+			             : "music01.mp3";
 			
-			try {
-				var soundUrl = flashvars["soundUrl"] as String;
-				var movieUrls = flashvars["movieUrls"] as String;
-				
-				if (soundUrl.length > 0 && movieUrls.length > 0){
-					
-					_trackData = {
-						url: soundUrl,
-						vars: {
-							name: "track",
-							autoPlay:false,
-							repeat: 1,
-							estimateBytes: 9500
-						}
-					};
-					
-					_videoData = [];
-					var urls:Array = JSON.parse(movieUrls) as Array;
-					for(var i:int = 0; i < urls.length; i++) {
-						var vars:Object = {
-							name:"movie_" + i, 
-							width:320,
-							height:240, 
-							scaleMode:"proportionalInside", 
-							centerRegistration:true, 
-							alpha:1, 
-							volume:0,
-							autoPlay:false, 
-							estimatedBytes:"8887418" 
-						};
-						
-						_videoData.push({
-							url: urls[i],
-							vars: vars
-						});
-					}
-					
-					parseSuccess = true;
+			var urls:Array = params["movieUrls"] != undefined
+						   ? JSON.parse(params["movieUrls"]) as Array
+						   : ["movie14.mp4", "movie30.mp4",
+							  "movie35.mp4", "movie32.mp4"];
+	
+			
+			_trackData = {
+				url: soundUrl,
+				vars: {
+					name: "track",
+					autoPlay:false,
+					repeat: 1,
+					estimateBytes: 9500
 				}
-			} 
-			catch(error:Error) {
-				trace("fail for parse params.");
-			}
+			};
 			
-			debugger.msgText.text = "load data: " + parseSuccess + " l: " + _videoData.length;
+			_videoData = [];
+			
+			for(var i:int = 0; i < urls.length; i++) {
+				var vars:Object = {
+					name:"movie_" + i, 
+					width:640,
+					height:433, 
+					scaleMode:"proportionalInside", 
+					centerRegistration:true, 
+					alpha:1, 
+					volume:0,
+					autoPlay:false, 
+					estimatedBytes:"8887418" 
+				};
+				
+				_videoData.push({
+					url: urls[i],
+					vars: vars
+				});
+			}
 		}
 
 		
@@ -110,7 +104,7 @@
 			debugger.msgText.text = msg;
 		}
 	
-		public function startLoaderMax(): void {
+		function startLoaderMax(): void {
 			var queue:LoaderMax = new LoaderMax({
 				name: "DataList",
 				maxConnections:1,
@@ -125,42 +119,50 @@
 			_track = new MP3Loader(_trackData.url, _trackData.vars);
 			queue.append(_track);
 			
-			var t:String = "";
+			var msg:String = "";
 			_videos.length = 0;
 			var vl:VideoLoader = null;
 			for each (var v in _videoData) {
 				vl = new VideoLoader(v.url, v.vars); 
 				_videos.push(vl);
 				queue.append(vl);
-				t += v.url + " = ";
+				msg += v.url + " = ";
 			}
-			debug(t);
+			debug(msg);
 			queue.prependURLs("assets/");
 			queue.load();
+			
+			TweenMax.to(loadingAnim, 0.3, {
+				autoAlpha: 1,
+				onComplete: loadingAnim.start
+			});
 		}	
 
 	
 		function loaderProgressHandler(event:LoaderEvent):void {
 			var percent:int = Math.round(event.target.progress * 100);
-			loadingAnim.totalPercentText.text = "Total: " +  percent + " %";
+			loadingAnim.totalPercentText.text = percent.toString() + " %";
 						
 		}
 		
 		function loaderCompleteHandler(event:LoaderEvent): void {
-			loadingAnim.totalPercentText.text = "Total: DONE!";
 			showVideo(_videos[0]);
+			
+			TweenMax.to(loadingAnim, 0.3, {
+				autoAlpha: 0,
+				onComplete: loadingAnim.stop
+			});
 		}
 		
 		function childLoaderProgressHandler(event:LoaderEvent): void {
 			var percent:int = Math.round(event.target.progress * 100);
-			loadingAnim.childPercentText.text = "Child: " +  percent + " %";
+			loadingAnim.childPercentText.text = percent.toString() + " %";
 		}
 		
 		function childLoaderCompleteHandler(event:LoaderEvent): void {
-			loadingAnim.childPercentText.text = "Child: DONE!"
 		}
 
-		public function showVideo(video: VideoLoader): void {
+		function showVideo(video: VideoLoader): void {
 
 			if (video == _video) {
 				return;
@@ -248,7 +250,7 @@
             updateMonitor();
 		}
 
-		public function initMonitor(): void {
+		function initMonitor(): void {
 			if (!_isDebugEnable)
 				return;
 
@@ -256,7 +258,7 @@
 			debugger.videoIdText.text = "scene: --";
 		}
 
-		public function updateMonitor(): void {
+		function updateMonitor(): void {
 			if (!_isDebugEnable)
 				return;
 
@@ -264,7 +266,7 @@
 			debugger.videoIdText.text = "scene: " + videoIndex;
 		}
 
-		public function initUI(): void {
+		function initUI(): void {
 			loadingAnim.mouseEnabled = false;
 			controlBar.blendMode = "layer";
 
@@ -274,32 +276,31 @@
 		}
 
 
-
-		public function updateDownloadProgress(event: LoaderEvent = null): void {
+		function updateDownloadProgress(event: LoaderEvent = null): void {
 			
 		}
 
-		public function bufferFullHandler(event: LoaderEvent): void {
+		function bufferFullHandler(event: LoaderEvent): void {
 			TweenMax.to(loadingAnim, 0.3, {
 				autoAlpha: 0,
 				onComplete: loadingAnim.stop
 			});
 		}
 
-		public function updatePlayProgress(event: LoaderEvent = null): void {
+		function updatePlayProgress(event: LoaderEvent = null): void {
 			var time: Number = _video.videoTime;
 			var minutes: String = toTwoDigits(int(time / 60));
 			var seconds: String = toTwoDigits(int(time % 60));
 			controlBar.currentTimeText.text = minutes + ":" + seconds;
 		}
 
-		public function refreshTotalTime(event: LoaderEvent = null): void {
+		function refreshTotalTime(event: LoaderEvent = null): void {
 			var minutes: String = toTwoDigits(int(_video.duration / 60));
 			var seconds: String = toTwoDigits(int(_video.duration % 60));
 			controlBar.totalTimeText.text = minutes + ":" + seconds;
 		}
 
-		public function activateUI(): void {
+		function activateUI(): void {
 
 			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OVER, toggleControlUI);
 			addListeners([controlBar, videoContainer], MouseEvent.ROLL_OUT, toggleControlUI);
@@ -308,7 +309,7 @@
 			
 		}
 		
-		public function toggleControlUI(event: MouseEvent): void {
+		function toggleControlUI(event: MouseEvent): void {
 			_mouseIsOver = !_mouseIsOver;
 			if (_mouseIsOver) {
 				TweenMax.to(controlBar, 0.3, {
@@ -321,7 +322,7 @@
 			}
 		}
 
-		public function toggleAudio(event: MouseEvent): void {
+		function toggleAudio(event: MouseEvent): void {
 			_silentMode = !_silentMode;
 			if (_silentMode) {
 				_track.volume = 0;
@@ -330,7 +331,7 @@
 			}
 		}
 
-		public function togglePlayPause(event: MouseEvent = null): void {
+		function togglePlayPause(event: MouseEvent = null): void {
 			_video.videoPaused = !_video.videoPaused;
 			if (_video.videoPaused) {
 
@@ -359,7 +360,7 @@
 			}
 		}
 
-		public function nextVideo(event: Event): void {
+		function nextVideo(event: Event): void {
 			var next: int = _videos.indexOf(_video) + 1;
 			if (next >= _videos.length) {
 				next = 0;
@@ -367,7 +368,7 @@
 			showVideo(_videos[next]);
 		}
 
-		public function previousVideo(event: Event): void {
+		function previousVideo(event: Event): void {
 			var prev: int = _videos.indexOf(_video) - 1;
 			if (prev < 0) {
 				prev = _videos.length - 1;
@@ -375,11 +376,11 @@
 			showVideo(_videos[prev]);
 		}
 		
-		public function toTwoDigits(value: Number): String {
+		function toTwoDigits(value: Number): String {
 			return (value < 10) ? "0" + String(value) : String(value);
 		}
 	
-		public function addListeners(objects: Array, type: String, func: Function): void {
+		function addListeners(objects: Array, type: String, func: Function): void {
 			var i: int = objects.length;
 			while (i--) {
 				objects[i].addEventListener(type, func);
