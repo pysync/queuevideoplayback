@@ -16,7 +16,6 @@
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
-	import fl.containers.ScrollPane;
 	import flash.geom.ColorTransform;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;

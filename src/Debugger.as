@@ -29,7 +29,7 @@
 		
 		public function setTotalProgress(progress:Number):void {
 			var percent:int = Math.round(progress * 100);
-			childPercentText.text = percent.toString() + " %";	
+			totalPercentText.text = percent.toString() + " %";	
 		}
 		
 		function toTwoDigits(value: Number): String {
