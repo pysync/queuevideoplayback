@@ -1,8 +1,11 @@
 $( document ).ready(function() {
 	// ====================== Create Data Test ==================
 	var soundUrls = [
-		"music01.mp3", 
-		"music02.mp3"
+		"bgm01.mp3", 
+		"bgm02.mp3",
+		"bgm03.mp3", 
+		"bgm04.mp3",
+		"bgm05.mp3"
 	];
 	var movieUrls = [
 		  "scene_0001.mp4",
@@ -49,6 +52,18 @@ $( document ).ready(function() {
 	$("#change-bgm-btn-2").click(function(){ 
 		var player = document.getElementById("preview");
 		player.setBGM(soundUrls[1]);	
+	});
+	$("#change-bgm-btn-3").click(function(){ 
+		var player = document.getElementById("preview");
+		player.setBGM(soundUrls[2]);	
+	});
+	$("#change-bgm-btn-4").click(function(){ 
+		var player = document.getElementById("preview");
+		player.setBGM(soundUrls[3]);	
+	});
+	$("#change-bgm-btn-5").click(function(){ 
+		var player = document.getElementById("preview");
+		player.setBGM(soundUrls[4]);	
 	});
 
 });
