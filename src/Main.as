@@ -2,6 +2,7 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 
 	import com.greensock.TweenMax;
 	import com.greensock.events.LoaderEvent;
@@ -30,18 +31,21 @@
 		private var _trackData:Object = new Object();
 		public var _videoData: Array = [];
 		public var _videos: Array = [];
+		public var _queue:LoaderMax;
 		public var _track: MP3Loader;
 		public var _video: VideoLoader;
 		public var _mouseIsOver: Boolean;
 		public var _isStarted: Boolean;
 		private var _silentMode: Boolean;
+		private var _useTrack:Boolean;
 		public var _isDebugEnable: Boolean;
 
 	
 		public function Main() {
 			
-			loadParameters();
+			//loadParameters();
 			_silentMode = false;
+			_useTrack = false;
 			_isStarted = false;
 			_isDebugEnable = true;
 			_mouseIsOver = false;
@@ -49,24 +53,52 @@
 			
 			initUI();
 			initMonitor();
+			registerInterface();
+		}
+		
+		function registerInterface():void {
+			ExternalInterface.addCallback("playMovie", playSingleMovie);
+			ExternalInterface.addCallback("playMultiMovies", playMultiMovies);
+			ExternalInterface.addCallback("setBGM", setBGM);
+		}
+		
+		function playSingleMovie(movieUrl:String, soundUrl:String=null):void {
+			setVideoData([movieUrl]);
+			setTrackData(soundUrl);
+			stopAll();
+			startLoaderMax();
+		}
+
+		function playMultiMovies(movieUrls:Array, soundUrl:String=null):void {
+			setVideoData(movieUrls);
+			setTrackData(soundUrl);
+			stopAll();	
 			startLoaderMax();
 		}
 		
+		function setBGM(soundUrl:String):void {
+			setTrackData(soundUrl);
+			stopAll();
+			startLoaderMax();
+		}
 				
 		function loadParameters():void {
 			var params:Object = stage.loaderInfo.parameters;
 
 			var soundUrl = params["soundUrl"] != undefined 
 						 ? params["soundUrl"] as String
-			             : "music01.mp3";
+			             : "";
 			
-			var urls:Array = params["movieUrls"] != undefined
+			var movieUrls:Array = params["movieUrls"] != undefined
 						   ? JSON.parse(params["movieUrls"]) as Array
-						   : ["scene_0001.mp4", "scene_0002.mp4",
-							  "scene_0003.mp4", "scene_0004.mp4"];
-	
+						   : [];
 			
-			_trackData = {
+			setTrackData(soundUrl);
+			setVideoData(movieUrls);
+		}
+		
+		function setTrackData(soundUrl:String):void {
+			_trackData = soundUrl.length ? {
 				url: soundUrl,
 				vars: {
 					name: "track",
@@ -74,11 +106,14 @@
 					repeat: 1,
 					estimateBytes: 9500
 				}
-			};
-			
+			}: null;
+		}
+		
+		function setVideoData(movieUrls:Array):void {
+
 			_videoData = [];
 			
-			for(var i:int = 0; i < urls.length; i++) {
+			for(var i:int = 0; i < movieUrls.length; i++) {
 				var vars:Object = {
 					name:"movie_" + i, 
 					width:640,
@@ -92,19 +127,35 @@
 				};
 				
 				_videoData.push({
-					url: urls[i],
+					url: movieUrls[i],
 					vars: vars
 				});
-			}
+			}			
 		}
 
-		
 		function debug(msg:String):void {
 			debugger.msgText.text = msg;
 		}
 	
+		function stopAll():void {
+			if (_track && !_track.paused){
+				_track.paused = true;
+				_track.unload();
+			}
+			
+			if (_video && !_video.paused){
+				_video.paused = true;
+				_video.unload();
+			}
+
+			audioToggleButton.setMute(true);
+			largePlayPauseButton.setPaused(true);
+		}
+		
 		function startLoaderMax(): void {
-			var queue:LoaderMax = new LoaderMax({
+			if (_queue) {}
+			
+			_queue = new LoaderMax({
 				name: "DataList",
 				maxConnections:1,
 				autoLoad: false,
@@ -113,10 +164,16 @@
 				onChildProgress:childLoaderProgressHandler,
 				onChildComplete:childLoaderCompleteHandler
 			});
-			
-			
-			_track = new MP3Loader(_trackData.url, _trackData.vars);
-			queue.append(_track);
+						
+			if (_trackData && _trackData.url.length) {
+				_track = new MP3Loader(_trackData.url, _trackData.vars);
+				_useTrack = true;
+				_queue.append(_track);		
+			} else {
+				_useTrack = false;
+				_track = null;
+			}
+
 			
 			var msg:String = "";
 			_videos.length = 0;
@@ -124,12 +181,12 @@
 			for each (var v in _videoData) {
 				vl = new VideoLoader(v.url, v.vars); 
 				_videos.push(vl);
-				queue.append(vl);
+				_queue.append(vl);
 				msg += v.url + " = ";
 			}
 			debug(msg);
-			queue.prependURLs("assets/");
-			queue.load();
+			_queue.prependURLs("assets/");
+			_queue.load();
 			
 			TweenMax.to(loadingAnim, 0.3, {
 				autoAlpha: 1,
@@ -223,16 +280,17 @@
 			var _videoIndex = _videos.indexOf(_video);
 			if (!_isStarted || _videoIndex == 0) {
 				_isStarted = true;
-				_track.gotoSoundTime(0, true);
 				
-				_track.volume = 0;
-				audioToggleButton.setMute(_silentMode);
-				if (!_silentMode) {
-					TweenMax.to(_track, 0.8, {
-						volume: 1
-					});
+				if (_track && _useTrack) {
+					_track.gotoSoundTime(0, true);
+					_track.volume = 0;
+					audioToggleButton.setMute(_silentMode);
+					if (!_silentMode) {
+						TweenMax.to(_track, 0.8, {
+							volume: 1
+						});
+					}
 				}
-
 			}
 
 			videoContainer.addChild(_video.content);
@@ -323,6 +381,9 @@
 		}
 
 		function toggleAudio(event: MouseEvent): void {
+			if (!_useTrack || !_track){
+				return;
+			}
 			_silentMode = !_silentMode;
 			audioToggleButton.setMute(_silentMode);
 			if (_silentMode) {
@@ -338,7 +399,9 @@
 			largePlayPauseButton.setPaused(_video.videoPaused);
 			
 			if (_video.videoPaused) {
-				_track.soundPaused = true;
+				if (_useTrack && _track){
+					_track.soundPaused = true;
+				}
 				if (_mouseIsOver) {
 					TweenMax.to(largePlayPauseButton, 0.3, {
 						alpha: 1
@@ -354,7 +417,9 @@
 					}
 				});
 			} else {
-				_track.soundPaused = false;
+				if (_useTrack && _track){
+					_track.soundPaused = false;
+				}
 				if (_mouseIsOver) {
 					TweenMax.to(largePlayPauseButton, 0.3, {
 						alpha: 0
