@@ -35,6 +35,7 @@
 		public var _track: MP3Loader;
 		public var _video: VideoLoader;
 		public var _mouseIsOver: Boolean;
+		public var _isLoading:Boolean;
 		public var _isStarted: Boolean;
 		private var _silentMode: Boolean;
 		private var _useTrack:Boolean;
@@ -49,6 +50,7 @@
 			_isStarted = false;
 			_isDebugEnable = true;
 			_mouseIsOver = false;
+			_isLoading = false;
 			stage.scaleMode = "noScale";
 			
 			initUI();
@@ -77,6 +79,9 @@
 		}
 		
 		function setBGM(soundUrl:String):void {
+			if (!_video || !_videos || !_videos.length){
+				return;
+			}
 			setTrackData(soundUrl);
 			stopAll();
 			startLoaderMax();
@@ -147,9 +152,15 @@
 				_video.paused = true;
 				_video.unload();
 			}
-
-			audioToggleButton.setMute(true);
+				
+			_silentMode = false;
+			TweenMax.allTo([audioToggleButton, largePlayPauseButton, loadingAnim], 0, {
+				autoAlpha: 0
+			});
+			
+			audioToggleButton.setMute(_silentMode);
 			largePlayPauseButton.setPaused(true);
+			initMonitor();
 		}
 		
 		function startLoaderMax(): void {
@@ -175,25 +186,44 @@
 			}
 
 			
-			var msg:String = "";
+			
 			_videos.length = 0;
 			var vl:VideoLoader = null;
 			for each (var v in _videoData) {
 				vl = new VideoLoader(v.url, v.vars); 
 				_videos.push(vl);
 				_queue.append(vl);
-				msg += v.url + " = ";
 			}
+			var msg:String = "input scenes " + _videos.length;
+				msg += " / use sound " + (_useTrack ? "yes" : "no");
 			debug(msg);
+			
 			_queue.prependURLs("assets/");
 			_queue.load();
+			startLoading();
+
+		}	
+		
+		function startLoading():void {
+			_isLoading = true;
+			TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
+				autoAlpha: 0
+			});	
 			
 			TweenMax.to(loadingAnim, 0.3, {
 				autoAlpha: 1,
 				onComplete: loadingAnim.start
 			});
-		}	
-
+			
+		}
+		
+		function stopLoading():void {
+			_isLoading = false;
+			TweenMax.to(loadingAnim, 0.3, {
+				autoAlpha: 0,
+				onComplete: loadingAnim.stop
+			});
+		}
 	
 		function loaderProgressHandler(event:LoaderEvent):void {
 			debugger.setTotalProgress(event.target.progress);
@@ -202,11 +232,7 @@
 		
 		function loaderCompleteHandler(event:LoaderEvent): void {
 			showVideo(_videos[0]);
-			
-			TweenMax.to(loadingAnim, 0.3, {
-				autoAlpha: 0,
-				onComplete: loadingAnim.stop
-			});
+			stopLoading();
 		}
 		
 		function childLoaderProgressHandler(event:LoaderEvent): void {
@@ -239,10 +265,7 @@
 					togglePlayPause();
 				}
 
-				TweenMax.to(loadingAnim, 0.3, {
-					autoAlpha: 0,
-					onComplete: loadingAnim.stop
-				});
+				stopLoading();
 
 				TweenMax.to(_video.content, 0.8, {
 					autoAlpha: 0
@@ -263,10 +286,7 @@
 				_video.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, bufferFullHandler);
 				_video.prioritize(true);
 				
-				loadingAnim.play();
-				TweenMax.to(loadingAnim, 0.3, {
-					autoAlpha: 1
-				});
+				startLoading();
 			}
 
 			//start playing the video from its beginning
@@ -321,7 +341,8 @@
 				return;
 
 			var videoIndex = _videos.indexOf(_video) + 1;
-			debugger.videoIdText.text = videoIndex.toString();
+			var inforText = videoIndex + " / " + _videos.length;
+			debugger.videoIdText.text = inforText;
 		}
 
 		function initUI(): void {
@@ -342,10 +363,7 @@
 		}
 
 		function bufferFullHandler(event: LoaderEvent): void {
-			TweenMax.to(loadingAnim, 0.3, {
-				autoAlpha: 0,
-				onComplete: loadingAnim.stop
-			});
+			stopLoading();
 		}
 
 		function updatePlayProgress(event: LoaderEvent = null): void {
@@ -358,8 +376,8 @@
 
 		function activateUI(): void {
 
-			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OVER, toggleControlUI);
-			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OUT, toggleControlUI);
+			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OVER, showControlUI);
+			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OUT, hideControlUI);
 			
 			var butons = [largePlayPauseButton, videoContainer];
 			addListeners(butons, MouseEvent.CLICK, togglePlayPause);
@@ -367,17 +385,18 @@
 			
 		}
 		
-		function toggleControlUI(event: MouseEvent): void {
-			_mouseIsOver = !_mouseIsOver;
-			if (_mouseIsOver) {
-				TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.3, {
+		function showControlUI(event: MouseEvent): void {
+			if (_isLoading) return;
+			TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.3, {
 					autoAlpha: 1
-				});
-			} else {
-				TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
-					autoAlpha: 0
-				});
-			}
+			});
+		}
+		
+		function hideControlUI(event: MouseEvent):void {
+			if (_isLoading) return;
+			TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
+				autoAlpha: 0
+			});	
 		}
 
 		function toggleAudio(event: MouseEvent): void {
@@ -402,11 +421,8 @@
 				if (_useTrack && _track){
 					_track.soundPaused = true;
 				}
-				if (_mouseIsOver) {
-					TweenMax.to(largePlayPauseButton, 0.3, {
-						alpha: 1
-					});
-				}
+
+				
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 6,
@@ -419,12 +435,9 @@
 			} else {
 				if (_useTrack && _track){
 					_track.soundPaused = false;
+
 				}
-				if (_mouseIsOver) {
-					TweenMax.to(largePlayPauseButton, 0.3, {
-						alpha: 0
-					});
-				}
+			
 				TweenMax.to(videoContainer, 0.3, {
 					blurFilter: {
 						blurX: 0,
