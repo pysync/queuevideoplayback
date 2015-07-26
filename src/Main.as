@@ -39,16 +39,18 @@
 		public var _isStarted: Boolean;
 		private var _silentMode: Boolean;
 		private var _useTrack:Boolean;
+		private var _isAutoPlay:Boolean;
+		public var _isRelativePath:Boolean;
+		public var _prependURL:String;
 		public var _isDebugEnable: Boolean;
 
 	
 		public function Main() {
 			
-			//loadParameters();
+			loadParameters();
 			_silentMode = false;
 			_useTrack = false;
 			_isStarted = false;
-			_isDebugEnable = true;
 			_mouseIsOver = false;
 			_isLoading = false;
 			stage.scaleMode = "noScale";
@@ -56,6 +58,11 @@
 			initUI();
 			initMonitor();
 			registerInterface();
+			
+			if (_isAutoPlay) {
+				stopAll();	
+				startLoaderMax();
+			}
 		}
 		
 		function registerInterface():void {
@@ -89,7 +96,25 @@
 				
 		function loadParameters():void {
 			var params:Object = stage.loaderInfo.parameters;
-
+			var debugEnable = params["debugEnable"] != undefined
+			               ? params["debugEnable"] as String
+			               : "false";
+			_isDebugEnable = debugEnable == "true";
+			
+			var autoPlay = params["autoPlay"] != undefined
+			             ? params["autoPlay"] as String
+			             : "false";
+			_isAutoPlay = autoPlay == "true";
+			
+			var relativePath = params["relativePath"] !=undefined
+						     ? params["relativePath"] as String
+			                 : "true"
+			_isRelativePath = relativePath == "true";
+			
+			_prependURL = params["prependURL"] != undefined 
+						? params["prependURL"] as String
+						: "";
+			
 			var soundUrl = params["soundUrl"] != undefined 
 						 ? params["soundUrl"] as String
 			             : "";
@@ -196,9 +221,13 @@
 			}
 			var msg:String = "input scenes " + _videos.length;
 				msg += " / use sound " + (_useTrack ? "yes" : "no");
+			    msg += " / path relative " + (_isRelativePath ? "yes": "no");
 			debug(msg);
 			
-			_queue.prependURLs("assets/");
+			if (_isRelativePath && _prependURL.length) {
+				_queue.prependURLs(_prependURL);
+			}
+			
 			_queue.load();
 			startLoading();
 
@@ -331,8 +360,12 @@
 		}
 
 		function initMonitor(): void {
-			if (!_isDebugEnable)
+			trace("isDebug: " + _isDebugEnable);
+			if (!_isDebugEnable) {
+				debugger.visible = false;
 				return;
+			}
+			debugger.visible = true;
 			debugger.videoIdText.text = "--";
 		}
 

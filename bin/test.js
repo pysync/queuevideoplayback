@@ -13,10 +13,34 @@ $( document ).ready(function() {
 		  "scene_0003.mp4",
 		  "scene_0004.mp4"
 	];
+	
+	soundUrls = [
+		"http://localhost:5000/assets/bgm01.mp3", 
+		"http://localhost:5000/assets/bgm02.mp3",
+		"http://localhost:5000/assets/bgm03.mp3", 
+		"http://localhost:5000/assets/bgm04.mp3",
+		"http://localhost:5000/assets/bgm05.mp3"
+	];
+	movieUrls = [
+		  "http://localhost:5000/assets/scene_0001.mp4",
+		  "http://localhost:5000/assets/scene_0002.mp4",
+		  "http://localhost:5000/assets/scene_0003.mp4",
+		  "http://localhost:5000/assets/scene_0004.mp4"
+	];
 
 	// ====================== Embed SWF To HTML =================
 	
-	var flashvars = {};
+	var flashvars = {
+		debugEnable: true,
+		relativePath: true,
+		prependURL: "assets/",
+		autoPlay: true,
+		soundUrl: soundUrls[0],
+		movieUrls:  JSON.stringify(movieUrls)
+	};
+	
+	flashvars["relativePath"] = false;
+	
 	var params = {};
 	var attributes = {};
 
