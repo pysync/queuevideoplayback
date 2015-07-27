@@ -1,39 +1,34 @@
 $( document ).ready(function() {
 	// ====================== Create Data Test ==================
-
-	// Test data with absolute path
-	soundUrls = [
-		"https://tbs-dev.herokuapp.com/assets/bgm01.mp3", 
-		"https://tbs-dev.herokuapp.com/assets/bgm02.mp3",
-		"https://tbs-dev.herokuapp.com/assets/bgm03.mp3", 
-		"https://tbs-dev.herokuapp.com/assets/bgm04.mp3",
-		"https://tbs-dev.herokuapp.com/assets/bgm05.mp3"
+	var soundUrls = [
+		"bgm01.mp3", 
+		"bgm02.mp3",
+		"bgm03.mp3", 
+		"bgm04.mp3",
+		"bgm05.mp3"
 	];
-	movieUrls = [
-		  "https://tbs-dev.herokuapp.com/assets/scene_0001.mp4",
-		  "https://tbs-dev.herokuapp.com/assets/scene_0002.mp4",
-		  "https://tbs-dev.herokuapp.com/assets/scene_0003.mp4",
-		  "https://tbs-dev.herokuapp.com/assets/scene_0004.mp4"
+	var movieUrls = [
+		  "scene_0001.mp4",
+		  "scene_0002.mp4",
+		  "scene_0003.mp4",
+		  "scene_0004.mp4"
 	];
+	
 
 	// ====================== Embed SWF To HTML =================
 	
 	var flashvars = {
 		debugEnable: true,
-		relativePath: false,
-		prependURL: "assets/",
-		autoPlay: true,
-		soundUrl: soundUrls[0],
-		movieUrls:  JSON.stringify(movieUrls)
+		relativePath: true,
+		prependURL: "/assets/"
 	};
-	
 	
 	var params = {};
 	var attributes = {};
 
-	swfobject.embedSWF("Main.swf", "preview", 
+	swfobject.embedSWF("swf/Main.swf", "preview", 
 					   "100%", "100%", 
-	                   "9.0.0", "expressInstall.swf", 
+	                   "9.0.0", "swf/expressInstall.swf", 
 	                   flashvars, params, attributes);
 								
 
