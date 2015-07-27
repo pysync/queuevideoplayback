@@ -21,7 +21,6 @@ $( document ).ready(function() {
 	var flashvars = {
 		debugEnable: true,
 		relativePath: false,
-		prependURL: "assets/",
 		autoPlay: true,
 		soundUrl: soundUrls[0],
 		movieUrls:  JSON.stringify(movieUrls)
