@@ -43,11 +43,24 @@ span {
 	color: green;
 	font-size: 14px;
 }
+hr {
+	height: 1px;
+	display: block;
+	margin-bottom: 1px;
+}
 
-.link {
+.link-1 {
 	font-size: 10px;
 	color: blue;
 	text-align:right;
 	margin-right:10px;
 	float:right;
+}
+
+.link-2 {
+	font-size: 10px;
+	color: blue;
+	text-align:left;
+	margin-right:10px;
+	float:left;
 }

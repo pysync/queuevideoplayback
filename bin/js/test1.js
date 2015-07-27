@@ -20,14 +20,18 @@ $( document ).ready(function() {
 	// ====================== Embed SWF To HTML =================
 	
 	var flashvars = {
-		debugEnable: true,			/* in production, need remove this line or set value to fasle */
-		relativePath: true,			/* set value to true to flash-player know all urls we using as relative */
-		prependURL: "/assets/"		/* when paths is relative we need specific prependURL 
-									   for example: if our's movies at path:
-		                                            http://example.com/todaymovie/assets/movie01.mp4
+		// in production, need remove this line or set value to fasle 
+		debugEnable: true,			
 		
-		                               => prependURL will be: "/todaymovie/assets/" 
-									*/
+		// set value to true to flash-player know all urls we using as relative
+		relativePath: true,			
+
+		// when paths is relative we need specific prependURL
+		// for example: if our's movies at path: 
+		// http://example.com/todaymovie/assets/movie01.mp4
+        // => prependURL will be: "/todaymovie/assets/" 
+		prependURL: "/assets/"	
+			
 	};
 	
 	var params = {};
