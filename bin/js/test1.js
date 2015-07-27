@@ -1,5 +1,7 @@
 $( document ).ready(function() {
 	// ====================== Create Data Test ==================
+	
+	// Test data with relative path
 	var soundUrls = [
 		"bgm01.mp3", 
 		"bgm02.mp3",
@@ -18,18 +20,25 @@ $( document ).ready(function() {
 	// ====================== Embed SWF To HTML =================
 	
 	var flashvars = {
-		debugEnable: true,
-		relativePath: true,
-		prependURL: "/assets/"
+		debugEnable: true,			/* in production, need remove this line or set value to fasle */
+		relativePath: true,			/* set value to true to flash-player know all urls we using as relative */
+		prependURL: "/assets/"		/* when paths is relative we need specific prependURL 
+									   for example: if our's movies at path:
+		                                            http://example.com/todaymovie/assets/movie01.mp4
+		
+		                               => prependURL will be: "/todaymovie/assets/" 
+									*/
 	};
 	
 	var params = {};
 	var attributes = {};
 
-	swfobject.embedSWF("swf/Main.swf", "preview", 
-					   "100%", "100%", 
-	                   "9.0.0", "swf/expressInstall.swf", 
-	                   flashvars, params, attributes);
+	swfobject.embedSWF("swf/Main.swf", 		  /* path to we flash player */
+				   "preview", 				 /* id of HTML tag we want embed flash player */ 
+				   "100%", "100%", 
+                   "9.0.0", 
+				   "swf/expressInstall.swf", /* path to expressInstall swf (swfobject) */
+                   flashvars, params, attributes);
 								
 
 	// ==================== TEST BUTTONS ======================

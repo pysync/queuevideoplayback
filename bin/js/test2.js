@@ -1,7 +1,9 @@
 $( document ).ready(function() {
 	// ====================== Create Data Test ==================
 
-	// Test data with absolute path
+	// Test data with absolute path, in this case 
+	// we let's need pass: relativePath=false to flash vars.
+	
 	soundUrls = [
 		"https://tbs-dev.herokuapp.com/assets/bgm01.mp3", 
 		"https://tbs-dev.herokuapp.com/assets/bgm02.mp3",
@@ -19,20 +21,24 @@ $( document ).ready(function() {
 	// ====================== Embed SWF To HTML =================
 	
 	var flashvars = {
-		debugEnable: true,
-		relativePath: false,
-		autoPlay: true,
-		soundUrl: soundUrls[0],
-		movieUrls:  JSON.stringify(movieUrls)
+		debugEnable: true,			/* in production, need remove this line or set value to fasle */
+		relativePath: false,		/* set value to false to flash-player know all urls we using as absolute */
+		
+		/* when we want to auto play, we need some params init flash player */
+		autoPlay: true,				               /* when we want to play immediate */
+		soundUrl: soundUrls[0],                    /* setup initial start-up sound url [ use for autoPlay ] */
+		movieUrls:  JSON.stringify(movieUrls)      /* setup initial start-up movie urls - must is json [ use for autoPlay ] */ 
 	};
 	
 	
 	var params = {};
 	var attributes = {};
 
-	swfobject.embedSWF("swf/Main.swf", "preview", 
+	swfobject.embedSWF("swf/Main.swf", 			 /* path to we flash player */
+					   "preview", 				 /* id of HTML tag we want embed flash player */ 
 					   "100%", "100%", 
-	                   "9.0.0", "swf/expressInstall.swf", 
+	                   "9.0.0", 
+					   "swf/expressInstall.swf", /* path to expressInstall swf (swfobject) */
 	                   flashvars, params, attributes);
 								
 
