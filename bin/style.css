@@ -43,3 +43,11 @@ span {
 	color: green;
 	font-size: 14px;
 }
+
+.link {
+	font-size: 10px;
+	color: blue;
+	text-align:right;
+	margin-right:10px;
+	float:right;
+}
