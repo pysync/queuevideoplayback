@@ -33,7 +33,7 @@ $( document ).ready(function() {
 	var params = {};
 	var attributes = {};
 
-	swfobject.embedSWF("swf/Main.swf", 		  /* path to we flash player */
+	swfobject.embedSWF("swf/Main.swf", 		 /* path to we flash player */
 				   "preview", 				 /* id of HTML tag we want embed flash player */ 
 				   "100%", "100%", 
                    "9.0.0", 
