@@ -3,17 +3,17 @@ $( document ).ready(function() {
 
 	// Test data with absolute path
 	soundUrls = [
-		"http://localhost:5000/assets/bgm01.mp3", 
-		"http://localhost:5000/assets/bgm02.mp3",
-		"http://localhost:5000/assets/bgm03.mp3", 
-		"http://localhost:5000/assets/bgm04.mp3",
-		"http://localhost:5000/assets/bgm05.mp3"
+		"https://tbs-dev.herokuapp.com/assets/bgm01.mp3", 
+		"https://tbs-dev.herokuapp.com/assets/bgm02.mp3",
+		"https://tbs-dev.herokuapp.com/assets/bgm03.mp3", 
+		"https://tbs-dev.herokuapp.com/assets/bgm04.mp3",
+		"https://tbs-dev.herokuapp.com/assets/bgm05.mp3"
 	];
 	movieUrls = [
-		  "http://localhost:5000/assets/scene_0001.mp4",
-		  "http://localhost:5000/assets/scene_0002.mp4",
-		  "http://localhost:5000/assets/scene_0003.mp4",
-		  "http://localhost:5000/assets/scene_0004.mp4"
+		  "https://tbs-dev.herokuapp.com/assets/scene_0001.mp4",
+		  "https://tbs-dev.herokuapp.com/assets/scene_0002.mp4",
+		  "https://tbs-dev.herokuapp.com/assets/scene_0003.mp4",
+		  "https://tbs-dev.herokuapp.com/assets/scene_0004.mp4"
 	];
 
 	// ====================== Embed SWF To HTML =================
