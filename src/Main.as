@@ -43,6 +43,7 @@
 		public var _isRelativePath:Boolean;
 		public var _prependURL:String;
 		public var _isDebugEnable: Boolean;
+		private var _isTheEndReached: Boolean;
 
 	
 		public function Main() {
@@ -53,6 +54,7 @@
 			_isStarted = false;
 			_mouseIsOver = false;
 			_isLoading = false;
+			_isTheEndReached = false;
 			stage.scaleMode = "noScale";
 			
 			initUI();
@@ -273,7 +275,7 @@
 
 		function showVideo(video: VideoLoader): void {
 
-			if (video == _video) {
+			if (video == _video && _video.playProgress == 0) {
 				return;
 			}
 			
@@ -446,7 +448,11 @@
 		}
 		
 		function togglePlayPause(event: MouseEvent = null): void {
-
+			if (_isTheEndReached) {
+				rePlay();
+				return
+			}
+			
 			_video.videoPaused = !_video.videoPaused;
 			largePlayPauseButton.setPaused(_video.videoPaused);
 			
@@ -484,11 +490,56 @@
 				});
 			}
 		}
+		
+		function rePlay(): void {
+			_isTheEndReached = false;
+			largePlayPauseButton.setPaused(false);
+		
+			TweenMax.to(videoContainer, 0.3, {
+				blurFilter: {
+					blurX: 0,
+					blurY: 0,
+					remove: true
+				},
+				colorMatrixFilter: {
+					brightness: 1,
+					remove: true
+				}
+			});
+			
+			showVideo(_videos[0]);			
+		}
+		
+		function goTheEnd(): void {
+			_isTheEndReached = true;
+			_video.videoPaused = true;
+			largePlayPauseButton.setPaused(true);
+
+			if (_useTrack && _track){
+				_track.soundPaused = true;
+			}
+
+			TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.3, {
+				autoAlpha: 1
+			});
+			
+			TweenMax.to(videoContainer, 0.3, {
+				blurFilter: {
+					blurX: 6,
+					blurY: 6
+				},
+				colorMatrixFilter: {
+					brightness: 0.5
+				}
+			});
+
+		}
 
 		function nextVideo(event: Event): void {
 			var next: int = _videos.indexOf(_video) + 1;
 			if (next >= _videos.length) {
-				next = 0;
+				goTheEnd();
+				return;
 			}
 			showVideo(_videos[next]);
 		}
