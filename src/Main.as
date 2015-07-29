@@ -426,7 +426,7 @@
 		}
 		
 		function hideControlUI(event: MouseEvent):void {
-			if (_isLoading) return;
+			if (_isLoading || (_video && _video.videoPaused)) return;
 			TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
 				autoAlpha: 0
 			});	
