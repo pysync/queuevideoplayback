@@ -296,7 +296,7 @@
 
 				stopLoading();
 
-				TweenMax.to(_video.content, 0.8, {
+				TweenMax.to(_video.content, 0.0, {
 					autoAlpha: 0
 				});
 				
@@ -344,7 +344,7 @@
 
 			videoContainer.addChild(_video.content);
 
-			TweenMax.to(_video.content, 0.8, {
+			TweenMax.to(_video.content, 0.0, {
 				autoAlpha: 1
 			});
 
