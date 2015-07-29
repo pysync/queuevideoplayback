@@ -150,7 +150,7 @@
 					name:"movie_" + i, 
 					width:640,
 					height:360, 
-					scaleMode:"proportionalInside", 
+					scaleMode:"none", 
 					centerRegistration:true, 
 					alpha:1, 
 					volume:0,
