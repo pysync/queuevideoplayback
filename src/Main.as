@@ -412,7 +412,7 @@
 			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OVER, showControlUI);
 			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OUT, hideControlUI);
 			
-			var butons = [largePlayPauseButton, videoContainer];
+			var butons = [largePlayPauseButton];
 			addListeners(butons, MouseEvent.CLICK, togglePlayPause);
 			audioToggleButton.addEventListener(MouseEvent.CLICK, toggleAudio);
 			
