@@ -62,6 +62,18 @@ $( document ).ready(function() {
 		var player = document.getElementById("preview");
 		player.playMultiMovies(movieUrls, soundUrls[0]);	
 	});
+
+	$("#play-multi-movie-btn2").click(function(){
+		var player = document.getElementById("preview");
+		var movieUrls = [
+		  "scene_0001.mp4",
+		  "scene_0002.mp4",
+		  "scene_0003.mp4",
+		  "scene_0004.mp4",
+		  "scene_0005.mp4"
+		];
+		player.playMultiMovies(movieUrls, soundUrls[1]);	
+	});
 	
 	$("#change-bgm-btn-1").click(function(){ 
 		var player = document.getElementById("preview");

@@ -37,6 +37,7 @@
 		public var _mouseIsOver: Boolean;
 		public var _isLoading:Boolean;
 		public var _isStarted: Boolean;
+		public var _isUIInitialized: Boolean;
 		private var _silentMode: Boolean;
 		private var _useTrack:Boolean;
 		private var _isAutoPlay:Boolean;
@@ -49,6 +50,7 @@
 		public function Main() {
 			
 			loadParameters();
+			_isUIInitialized = false;
 			_silentMode = false;
 			_useTrack = false;
 			_isStarted = false;
@@ -129,22 +131,29 @@
 			setVideoData(movieUrls);
 
 
-			// setDummyData();
+			//setDummyData();
 		}
 		
 		function setDummyData():void {
 			_isDebugEnable = true;
 			_isAutoPlay = true;
-			_silentMode = true;
+			_silentMode = false;
 
 			trace("setDummyData: " + _isDebugEnable);
 
 			var soundUrl = "bgm01.mp3";
-			var movieUrls = ["scene_0001.mp4", "scene_0002.mp4"];
+			//var movieUrls = ["dump1.mp4", "dump2.mp4", "dump3.mp4", "dump4.mp4","dump5.mp4", "dump6.mp4"];
+			var movieUrls = [
+			  "scene_0001.mp4",
+			  "scene_0002.mp4",
+			  "scene_0003.mp4",
+			  "scene_0004.mp4"
+			];
+
 			_isRelativePath = true;
 			_prependURL = "../assets/";
 
-			setTrackData("");
+			setTrackData(soundUrl);
 			setVideoData(movieUrls);
 		}
 
@@ -195,6 +204,9 @@
 		}
 	
 		function stopAll():void {
+			
+			_isStarted = false;
+
 			if (_track && !_track.paused){
 				_track.paused = true;
 				_track.unload();
@@ -241,9 +253,17 @@
 			});
 						
 			if (_trackData && _trackData.url.length) {
-				_track = new MP3Loader(_trackData.url, _trackData.vars);
+				var trackUrl = _trackData.url
+				if (_isRelativePath && _prependURL.length) {
+					trackUrl = _prependURL + trackUrl;
+				}
+				_track = new MP3Loader(trackUrl, _trackData.vars);
 				_useTrack = true;
-				_queue.append(_track);		
+				_track.prioritize(true);
+				_track.load();
+				_track.addEventListener(LoaderEvent.COMPLETE, onTrackLoadComplete);
+
+				// _queue.append(_track);		
 			} else {
 				_useTrack = false;
 				_track = null;
@@ -292,22 +312,36 @@
 				onComplete: loadingAnim.stop
 			});
 		}
-	
+		
+		function onTrackLoadComplete(event:LoaderEvent):void {
+			if (_useTrack && event.target == _track) {
+				if (!_isStarted) {
+					showVideo(_videos[0]);
+				}
+			}
+		}
+
 		function loaderProgressHandler(event:LoaderEvent):void {
-			debugger.setTotalProgress(event.target.progress);
-						
+			debugger.setTotalProgress(event.target.progress);	
 		}
 		
 		function loaderCompleteHandler(event:LoaderEvent): void {
-			showVideo(_videos[0]);
 			stopLoading();
 		}
 		
 		function childLoaderProgressHandler(event:LoaderEvent): void {
 			debugger.setChildProgress(event.target.progress);
+
+			if (!_isStarted && event.target.progress >= 0.25){
+				if (!_useTrack && event.target != _track) {
+					trace("call here");
+					showVideo(_videos[0]);
+				}
+			}	
 		}
 		
 		function childLoaderCompleteHandler(event:LoaderEvent): void {
+			trace("child load onComplete");
 		}
 
 		function showVideo(video: VideoLoader, replay:Boolean = false): void {
@@ -317,7 +351,7 @@
 			}			
 			
 			// The firstime
-			if (_video == null && !_isStarted) {
+			if (_video == null && !_isUIInitialized) {
 				activateUI(); 
 			} 
 			else {
@@ -342,7 +376,7 @@
 			_video.addEventListener(VideoLoader.PLAY_PROGRESS, updatePlayProgress);	
 			
 			
-			if (_video.progress < 1 && _video.bufferProgress < 1) {
+			if (_video.progress < 1 && _video.bufferProgress < 0.25) {
 
 				_video.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, bufferFullHandler);
 				_video.prioritize(true);
@@ -444,7 +478,7 @@
 		}
 
 		function activateUI(): void {
-
+			_isUIInitialized = true;
 			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OVER, showControlUI);
 			addListeners([audioToggleButton, videoContainer, largePlayPauseButton], MouseEvent.ROLL_OUT, hideControlUI);
 			
