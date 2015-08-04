@@ -129,7 +129,7 @@
 			setVideoData(movieUrls);
 
 
-			//setDummyData();
+			// setDummyData();
 		}
 		
 		function setDummyData():void {
@@ -163,15 +163,21 @@
 		function setVideoData(movieUrls:Array):void {
 
 			_videoData = [];
-			
+
+
 			for(var i:int = 0; i < movieUrls.length; i++) {
 				var vars:Object = {
+					x: -320, 
+					y: -180,
 					name:"movie_" + i, 
-					width:640,
+					container:videoContainer, 
+					width:640, 
 					height:360, 
-					scaleMode:"none", 
-					centerRegistration:true, 
-					alpha:1, 
+					scaleMode:"None", 
+					//centerRegistration: true,
+					requireWithRoot:videoContainer, 
+					bgColor:0x000000,
+					alpha:0, 
 					volume:0,
 					autoPlay:false, 
 					estimatedBytes:"654000"
@@ -325,11 +331,9 @@
 
 				stopLoading();
 
-				if (videoContainer.contains(_video.content)) {
-					_video.videoTime = 0;
-					_video.playProgress = 0;
-					videoContainer.removeChild(_video.content);
-				}
+				TweenMax.to(_video.content, 0.0, {
+					autoAlpha: 0
+				});	
 			}
 			
 			_video = video;
@@ -375,7 +379,7 @@
 				}
 			}
 
-			videoContainer.addChild(_video.content);
+			//videoContainer.addChild(_video.content);
 			TweenMax.to(_video.content, 0.0, {
 				autoAlpha: 1
 			});			
@@ -565,8 +569,18 @@
 					brightness: 0.5
 				}
 			});
-			_video.videoPaused = true;
-			_video.videoTime = 0;
+			
+			for (var i:int = 0; i < _videos.length; i++) {
+				var video:VideoLoader = _videos[i];
+				if (video != _video) {
+					TweenMax.to(video.content, 0.0, {
+						autoAlpha: 0
+					});	
+				}
+				_video.videoPaused = true;
+				video.videoTime = 0;
+				video.playProgress = 0;
+			}
 		}
 
 		function nextVideo(event: Event): void {
