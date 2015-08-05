@@ -70,7 +70,8 @@ $( document ).ready(function() {
 		  "scene_0002.mp4",
 		  "scene_0003.mp4",
 		  "scene_0004.mp4",
-		  "scene_0005.mp4"
+		  "scene_0005.mp4",
+		  "scene_0006.mp4"
 		];
 		player.playMultiMovies(movieUrls, soundUrls[1]);	
 	});
