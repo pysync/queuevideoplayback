@@ -100,9 +100,9 @@
 				
 		function loadParameters():void {
 			var params:Object = stage.loaderInfo.parameters;
-			var debugEnable = params["debugEnable"] != undefined
-			               ? params["debugEnable"] as String
-			               : "false";
+			var debugEnable = params["__DEBUG__"] != undefined
+			               ? params["__DEBUG__"] as String
+			               : "true";
 			_isDebugEnable = debugEnable == "true";
 			
 			var autoPlay = params["autoPlay"] != undefined
