@@ -128,11 +128,11 @@
 						   ? JSON.parse(params["movieUrls"]) as Array
 						   : [];
 			
-			setTrackData(soundUrl);
-			setVideoData(movieUrls);
+			//setTrackData(soundUrl);
+			//setVideoData(movieUrls);
 
 
-			//setDummyData();
+			setDummyData();
 		}
 		
 		function setDummyData():void {
@@ -148,6 +148,7 @@
 			  "scene_0001.mp4",
 			  "scene_0002.mp4",
 			  "scene_0003.mp4",
+			  "stand_by_me.mp4",
 			  "scene_0004.mp4"
 			];
 
@@ -487,12 +488,14 @@
 		}
 		
 		function videoPlayHandler(event: LoaderEvent):void {
+			debug("video play event");
 			if (_useTrack && _track){
 				_track.soundPaused = false;
 			}
 		}
 		
 		function videoPauseHandler(event: LoaderEvent):void {
+			debug("video pause event");
 			if (_useTrack && _track){
 				_track.soundPaused = true;
 			}
