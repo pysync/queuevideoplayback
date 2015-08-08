@@ -63,6 +63,11 @@ $( document ).ready(function() {
 		player.playMultiMovies(movieUrls, soundUrls[0]);	
 	});
 
+	$("#play-long-movie").click(function(){ 
+		var player = document.getElementById("preview");
+		player.playMovie("30s_sample.mp4", soundUrls[0]);	
+	});
+
 	$("#play-multi-movie-btn2").click(function(){
 		var player = document.getElementById("preview");
 		var movieUrls = [
@@ -80,7 +85,7 @@ $( document ).ready(function() {
 		var player = document.getElementById("preview");
 		player.setBGM(soundUrls[0]);	
 	});
-	
+
 	$("#change-bgm-btn-2").click(function(){ 
 		var player = document.getElementById("preview");
 		player.setBGM(soundUrls[1]);	
