@@ -464,11 +464,20 @@
 
 		function updateDownloadProgress(event: LoaderEvent = null): void {
 			
+			// handle when video loading..
+			if (_video && _video.progress < 1) {
+				if (_video.bufferProgress < _video.playProgress + 0.1){
+					if (!_isLoading) startLoading();
+				}else {
+					if (_isLoading) stopLoading();
+				}
+			}
 		}
 
 		function bufferFullHandler(event: LoaderEvent): void {
 			stopLoading();
 		}
+		
 
 		function updatePlayProgress(event: LoaderEvent = null): void {
 			debugger.setPlayProgress(_video.videoTime);
