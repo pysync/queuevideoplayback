@@ -23,6 +23,7 @@
 	import com.greensock.loading.display.ContentDisplay;
 	import flash.display.DisplayObject;
 	import flash.utils.Dictionary;
+	import flash.events.VideoEvent;
 	
 
 	
@@ -375,6 +376,8 @@
 				_video.removeEventListener(VideoLoader.VIDEO_BUFFER_FULL, bufferFullHandler);
 				_video.removeEventListener(VideoLoader.VIDEO_COMPLETE, nextVideo);
 				_video.removeEventListener(LoaderEvent.INIT, refreshTotalTime);
+				_video.removeEventListener(VideoLoader.VIDEO_PLAY, videoPlayHandler);
+				_video.removeEventListener(VideoLoader.VIDEO_PAUSE, videoPauseHandler);
 
 				stopLoading();
 
@@ -387,6 +390,8 @@
 			_video.addEventListener(LoaderEvent.PROGRESS, updateDownloadProgress);
 			_video.addEventListener(VideoLoader.VIDEO_COMPLETE, nextVideo);
 			_video.addEventListener(VideoLoader.PLAY_PROGRESS, updatePlayProgress);	
+			_video.addEventListener(VideoLoader.VIDEO_PLAY, videoPlayHandler);
+			_video.addEventListener(VideoLoader.VIDEO_PAUSE, videoPauseHandler);
 			
 			
 			if (_video.progress < 1 && _video.bufferProgress < 0.25) {
@@ -479,6 +484,22 @@
 
 		function bufferFullHandler(event: LoaderEvent): void {
 			stopLoading();
+		}
+		
+		function videoPlayHandler(event: LoaderEvent):void {
+			if (!_video.videoPaused){
+				if (_useTrack && _track){
+					_track.soundPaused = false;
+				}
+			}
+		}
+		
+		function videoPauseHandler(event: LoaderEvent):void {
+			if (_video.videoPaused) {
+				if (_useTrack && _track){
+					_track.soundPaused = true;
+				}
+			}
 		}
 		
 
