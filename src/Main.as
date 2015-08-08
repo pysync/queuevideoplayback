@@ -338,7 +338,19 @@
 					stopLoading();
 					showVideo(_videos[0]);
 				}
-			}	
+			}
+			
+			if (_isStarted && event.target == _video){
+			
+				// handle when video loading..
+				if (_video && _video.progress < 1) {
+					if (_video.bufferProgress < _video.playProgress + 0.1){
+						if (!_isLoading) startLoading();
+					}else {
+						if (_isLoading) stopLoading();
+					}
+				}	
+			}
 		}
 		
 		function childLoaderCompleteHandler(event:LoaderEvent): void {
@@ -463,15 +475,6 @@
 
 
 		function updateDownloadProgress(event: LoaderEvent = null): void {
-			
-			// handle when video loading..
-			if (_video && _video.progress < 1) {
-				if (_video.bufferProgress < _video.playProgress + 0.1){
-					if (!_isLoading) startLoading();
-				}else {
-					if (_isLoading) stopLoading();
-				}
-			}
 		}
 
 		function bufferFullHandler(event: LoaderEvent): void {
