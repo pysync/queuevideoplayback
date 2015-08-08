@@ -316,6 +316,7 @@
 		function onTrackLoadComplete(event:LoaderEvent):void {
 			if (_useTrack && event.target == _track) {
 				if (!_isStarted) {
+					stopLoading();
 					showVideo(_videos[0]);
 				}
 			}
@@ -334,7 +335,7 @@
 
 			if (!_isStarted && event.target.progress >= 0.25){
 				if (!_useTrack && event.target != _track) {
-					trace("call here");
+					stopLoading();
 					showVideo(_videos[0]);
 				}
 			}	
