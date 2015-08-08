@@ -487,18 +487,14 @@
 		}
 		
 		function videoPlayHandler(event: LoaderEvent):void {
-			if (!_video.videoPaused){
-				if (_useTrack && _track){
-					_track.soundPaused = false;
-				}
+			if (_useTrack && _track){
+				_track.soundPaused = false;
 			}
 		}
 		
 		function videoPauseHandler(event: LoaderEvent):void {
-			if (_video.videoPaused) {
-				if (_useTrack && _track){
-					_track.soundPaused = true;
-				}
+			if (_useTrack && _track){
+				_track.soundPaused = true;
 			}
 		}
 		
