@@ -5,21 +5,21 @@ $( document ).ready(function() {
     // we let's need pass: relativePath=false to flash vars.
     
     soundUrls = [
-        "https://tbs-dev.herokuapp.com/assets/bgm01.mp3", 
-        "https://tbs-dev.herokuapp.com/assets/bgm02.mp3",
-        "https://tbs-dev.herokuapp.com/assets/bgm03.mp3", 
-        "https://tbs-dev.herokuapp.com/assets/bgm04.mp3",
-        "https://tbs-dev.herokuapp.com/assets/bgm05.mp3"
+        "http://seo-web.biz/tbs-video-generator/assets/bgm01.mp3", 
+        "http://seo-web.biz/tbs-video-generator/assets/bgm02.mp3",
+        "http://seo-web.biz/tbs-video-generator/assets/bgm03.mp3", 
+        "http://seo-web.biz/tbs-video-generator/assets/bgm04.mp3",
+        "http://seo-web.biz/tbs-video-generator/assets/bgm05.mp3"
     ];
     movieUrls = [
-          "https://tbs-dev.herokuapp.com/assets/scene_0001.mp4",
-          "https://tbs-dev.herokuapp.com/assets/scene_0002.mp4",
-          "https://tbs-dev.herokuapp.com/assets/scene_0003.mp4",
-          "https://tbs-dev.herokuapp.com/assets/scene_0004.mp4"
+          "http://seo-web.biz/tbs-video-generator/assets/scene_0001.mp4",
+          "http://seo-web.biz/tbs-video-generator/assets/scene_0002.mp4",
+          "http://seo-web.biz/tbs-video-generator/assets/scene_0003.mp4",
+          "http://seo-web.biz/tbs-video-generator/assets/scene_0004.mp4"
     ];
 
     fullMovieUrls = [
-        "https://tbs-dev.herokuapp.com/assets/30s_sample.mp4"
+        "http://seo-web.biz/tbs-video-generator/assets/30s_sample.mp4"
     ];
 
     // ====================== Embed SWF To HTML =================
