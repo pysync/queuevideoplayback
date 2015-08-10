@@ -55,7 +55,6 @@
 			_isUIInitialized = false;
 			_silentMode = false;
 			_useTrack = false;
-			_useSoundChanel = false;
 			_isStarted = false;
 			_mouseIsOver = false;
 			_isLoading = false;
@@ -124,6 +123,12 @@
 			             ? params["autoPlay"] as String
 			             : "false";
 			_isAutoPlay = autoPlay == "true";
+			
+			var useSoundChanel = params["useSoundChanel"] != undefined
+			             ? params["useSoundChanel"] as String
+			             : "false";
+			_useSoundChanel = useSoundChanel == "true";
+			
 			
 			var relativePath = params["relativePath"] !=undefined
 						     ? params["relativePath"] as String
@@ -297,6 +302,7 @@
 			}
 			var msg:String = "input scenes " + _videos.length;
 				msg += " / use track " + (_useTrack ? "yes" : "no");
+			    msg += " / sound chanel " + (_useSoundChanel ? "yes" : "no");
 			    msg += " / path relative " + (_isRelativePath ? "yes": "no");
 			debug(msg);
 			
