@@ -30,7 +30,7 @@ $( document ).ready(function() {
         // for example: if our's movies at path: 
         // http://example.com/todaymovie/assets/movie01.mp4
         // => prependURL will be: "/todaymovie/assets/" 
-        prependURL: "/assets/"  
+        prependURL: "/tbs-video-generator/assets/"  
             
     };
     
