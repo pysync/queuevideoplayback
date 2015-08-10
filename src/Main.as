@@ -40,6 +40,7 @@
 		public var _isStarted: Boolean;
 		public var _isUIInitialized: Boolean;
 		private var _silentMode: Boolean;
+		private var _useSoundChanel: Boolean;
 		private var _useTrack:Boolean;
 		private var _isAutoPlay:Boolean;
 		public var _isRelativePath:Boolean;
@@ -54,6 +55,7 @@
 			_isUIInitialized = false;
 			_silentMode = false;
 			_useTrack = false;
+			_useSoundChanel = false;
 			_isStarted = false;
 			_mouseIsOver = false;
 			_isLoading = false;
@@ -72,6 +74,7 @@
 		
 		function registerInterface():void {
 			ExternalInterface.addCallback("playMovie", playSingleMovie);
+			ExternalInterface.addCallback("playFullMovie", playFullSingleMovie);
 			ExternalInterface.addCallback("playMultiMovies", playMultiMovies);
 			ExternalInterface.addCallback("setBGM", setBGM);
 		}
@@ -80,13 +83,23 @@
 			setVideoData([movieUrl]);
 			setTrackData(soundUrl);
 			stopAll();
+			_useSoundChanel = false;
 			startLoaderMax();
 		}
+		
+		function playFullSingleMovie(movieUrl:String):void {
+			setVideoData([movieUrl]);
+			setTrackData("");
+			stopAll();
+			_useSoundChanel = true;
+			startLoaderMax();
+		}		
 
 		function playMultiMovies(movieUrls:Array, soundUrl:String=null):void {
 			setVideoData(movieUrls);
 			setTrackData(soundUrl);
 			stopAll();	
+			_useSoundChanel = false;
 			startLoaderMax();
 		}
 		
@@ -96,6 +109,7 @@
 			}
 			setTrackData(soundUrl);
 			stopAll();
+			_useSoundChanel = false;
 			startLoaderMax();
 		}
 				
@@ -261,6 +275,7 @@
 				}
 				_track = new MP3Loader(trackUrl, _trackData.vars);
 				_useTrack = true;
+				_useSoundChanel = false;
 				_track.prioritize(true);
 				_track.load();
 				_track.addEventListener(LoaderEvent.COMPLETE, onTrackLoadComplete);
@@ -281,7 +296,7 @@
 				_queue.append(vl);
 			}
 			var msg:String = "input scenes " + _videos.length;
-				msg += " / use sound " + (_useTrack ? "yes" : "no");
+				msg += " / use track " + (_useTrack ? "yes" : "no");
 			    msg += " / path relative " + (_isRelativePath ? "yes": "no");
 			debug(msg);
 			
@@ -403,8 +418,7 @@
 				startLoading();
 			}
 
-			//always start with the volume at 0, and fade it up to 1 if necessary.
-			_video.volume = 0;
+			_video.volume = (_useSoundChanel && !_silentMode) ? 1 : 0;
 
 			//start playing the video from its beginning
 			_video.gotoVideoTime(0, true);
@@ -418,9 +432,10 @@
 				
 				_isStarted = true;
 				var trackAvailable = _track && _useTrack;
-				audioToggleButton.setState(trackAvailable, _silentMode);
+				var soundAvailable = _useSoundChanel || trackAvailable;
+				audioToggleButton.setState(soundAvailable, _silentMode);
 				
-				if (trackAvailable) {
+				if (!_useSoundChanel && trackAvailable) {
 					_track.gotoSoundTime(0, true);
 					_track.volume = 0;
 					audioToggleButton.setMute(_silentMode);
@@ -430,6 +445,8 @@
 						});
 					}
 				}
+				
+				if(_useSoundChanel) audioToggleButton.setMute(_silentMode);
 			}
 
 			//videoContainer.addChild(_video.content);
@@ -548,15 +565,25 @@
 		}
 
 		function toggleAudio(event: MouseEvent): void {
-			if (!_useTrack || !_track){
+			if (!_useSoundChanel && (!_useTrack || !_track)){
 				return;
 			}
 			_silentMode = !_silentMode;
 			audioToggleButton.setMute(_silentMode);
-			if (_silentMode) {
-				_track.volume = 0;
-			} else {
-				_track.volume = 1;
+			if (_track) {
+				if (_silentMode) {
+					_track.volume = 0;
+				} else {
+					_track.volume = 1;
+				}
+			}
+			
+			if (_useSoundChanel){
+				if (_silentMode) {
+					_video.volume = 0;
+				} else {
+					_video.volume = 1;
+				}		
 			}
 		}
 		

@@ -65,7 +65,7 @@ $( document ).ready(function() {
 
 	$("#play-long-movie").click(function(){ 
 		var player = document.getElementById("preview");
-		player.playMovie("30s_sample.mp4", soundUrls[0]);	
+		player.playFullMovie("30s_sample.mp4");	
 	});
 
 	$("#play-multi-movie-btn2").click(function(){
