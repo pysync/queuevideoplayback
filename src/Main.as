@@ -552,14 +552,14 @@
 		
 		function showControlUI(event: MouseEvent): void {
 			if (_isLoading) return;
-			TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.3, {
+			TweenMax.allTo([audioToggleButton, largePlayPauseButton], 0.0, {
 					autoAlpha: 1
 			});
 		}
 		
 		function hideControlUI(event: MouseEvent):void {
 			if (_isLoading || (_video && _video.videoPaused)) return;
-			TweenMax.to([audioToggleButton, largePlayPauseButton], 0.3, {
+			TweenMax.to([audioToggleButton, largePlayPauseButton], 0.0, {
 				autoAlpha: 0
 			});	
 		}
