@@ -68,6 +68,7 @@ $( document ).ready(function() {
         player.playFullMovie("30s_sample.mp4"); 
     });
 
+
     $("#play-multi-movie-btn2").click(function(){
         var player = document.getElementById("preview");
         var movieUrls = [
@@ -85,6 +86,7 @@ $( document ).ready(function() {
         var player = document.getElementById("preview");
         player.setBGM(soundUrls[0]);    
     });
+
 
     $("#change-bgm-btn-2").click(function(){ 
         var player = document.getElementById("preview");

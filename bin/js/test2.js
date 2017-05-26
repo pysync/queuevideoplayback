@@ -22,9 +22,15 @@ $( document ).ready(function() {
         "http://seo-web.biz/tbs-video-generator/assets/30s_sample.mp4"
     ];
 
+    otherHostMovieUrls = [
+        "http://techslides.com/demos/sample-videos/small.mp4"
+    ]
+
     // ====================== Embed SWF To HTML =================
     
     var flashvars = {
+        __DEBUG__: false,            /* disable debug model */
+        allowScriptAccess: 'always', /* 念のため　*/
         debugEnable: true,          /* in production, need remove this line or set value to fasle */
         relativePath: false,        /* set value to false to flash-player know all urls we using as absolute */
         
@@ -56,6 +62,11 @@ $( document ).ready(function() {
 
     // ==================== TEST BUTTONS ======================
     
+        
+    $("#play-other-movie-btn").click(function(){ 
+        var player = document.getElementById("preview");
+        player.playFullMovie(otherHostMovieUrls[0]); 
+    });
                  
     $("#play-one-movie-btn-1").click(function(){ 
         var player = document.getElementById("preview");
