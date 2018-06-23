@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
-app.use(express.static(__dirname + '/bin/'));
+app.use(express.static(__dirname + '/build/'));
 
 app.get('/api/movies', function(res, res){
 	var d = [

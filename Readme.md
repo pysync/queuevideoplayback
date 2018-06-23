@@ -13,6 +13,24 @@ There a some main features of that video player is:
 6. friendly javascript API is exported for programming in your production.  
 
 
+### Guide to play sample pre-compiled video player in your PC
+
+```
+$ git clone repo-url
+$ git checkout master && git pull
+
+# install simple http server
+$ npm install -g http-server 
+
+# start simple http server with document root -> build folder
+# now you can see demo under url: http://127.0.0.1:8000
+$ http-server build 
+
+
+# you also can see demo by direct open demo html file in build directory
+# or copy ./build folder in your apache document root, nginx static folder 
+```
+
 ### Guide to include video player in your product
 
 ```
