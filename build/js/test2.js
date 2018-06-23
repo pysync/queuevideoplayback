@@ -5,21 +5,17 @@ $( document ).ready(function() {
     // we let's need pass: relativePath=false to flash vars.
     
     soundUrls = [
-        "http://seo-web.biz/tbs-video-generator/assets/bgm01.mp3", 
-        "http://seo-web.biz/tbs-video-generator/assets/bgm02.mp3",
-        "http://seo-web.biz/tbs-video-generator/assets/bgm03.mp3", 
-        "http://seo-web.biz/tbs-video-generator/assets/bgm04.mp3",
-        "http://seo-web.biz/tbs-video-generator/assets/bgm05.mp3"
+        "https://dungntnew.github.io/assets/videoplayer/bgm01.mp3", 
+        "https://dungntnew.github.io/assets/videoplayer/bgm02.mp3",
+        "https://dungntnew.github.io/assets/videoplayer/bgm03.mp3", 
+        "https://dungntnew.github.io/assets/videoplayer/bgm04.mp3",
+        "https://dungntnew.github.io/assets/videoplayer/bgm05.mp3"
     ];
     movieUrls = [
-          "http://seo-web.biz/tbs-video-generator/assets/scene_0001.mp4",
-          "http://seo-web.biz/tbs-video-generator/assets/scene_0002.mp4",
-          "http://seo-web.biz/tbs-video-generator/assets/scene_0003.mp4",
-          "http://seo-web.biz/tbs-video-generator/assets/scene_0004.mp4"
-    ];
-
-    fullMovieUrls = [
-        "http://seo-web.biz/tbs-video-generator/assets/30s_sample.mp4"
+          "https://dungntnew.github.io/assets/videoplayer/scene_0001.mp4",
+          "https://dungntnew.github.io/assets/videoplayer/scene_0002.mp4",
+          "https://dungntnew.github.io/assets/videoplayer/scene_0003.mp4",
+          "https://dungntnew.github.io/assets/videoplayer/scene_0004.mp4"
     ];
 
     otherHostMovieUrls = [
@@ -45,7 +41,7 @@ $( document ).ready(function() {
                                                         setup initial start-up sound url [ use for autoPlay ] 
                                                         Notice(*): this options will override useSoundChanel setting! 
                                                     */
-        movieUrls:  JSON.stringify(fullMovieUrls)   /* setup initial start-up movie urls - must is json [ use for autoPlay ] */ 
+        movieUrls:  JSON.stringify(movieUrls)   /* setup initial start-up movie urls - must is json [ use for autoPlay ] */ 
     };
     
     
@@ -91,18 +87,6 @@ $( document ).ready(function() {
     $("#change-bgm-btn-2").click(function(){ 
         var player = document.getElementById("preview");
         player.setBGM(soundUrls[1]);    
-    });
-    $("#change-bgm-btn-3").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[2]);    
-    });
-    $("#change-bgm-btn-4").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[3]);    
-    });
-    $("#change-bgm-btn-5").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[4]);    
     });
 
 });

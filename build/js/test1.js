@@ -4,10 +4,7 @@ $( document ).ready(function() {
     // Test data with relative path
     var soundUrls = [
         "bgm01.mp3", 
-        "bgm02.mp3",
-        "bgm03.mp3", 
-        "bgm04.mp3",
-        "bgm05.mp3"
+        "bgm02.mp3"
     ];
     var movieUrls = [
           "scene_0001.mp4",
@@ -30,7 +27,7 @@ $( document ).ready(function() {
         // for example: if our's movies at path: 
         // http://example.com/todaymovie/assets/movie01.mp4
         // => prependURL will be: "/todaymovie/assets/" 
-        prependURL: "/tbs-video-generator/assets/"  
+        prependURL: "/assets/"  
             
     };
     
@@ -63,12 +60,6 @@ $( document ).ready(function() {
         player.playMultiMovies(movieUrls, soundUrls[0]);    
     });
 
-    $("#play-long-movie").click(function(){ 
-        var player = document.getElementById("preview");
-        player.playFullMovie("30s_sample.mp4"); 
-    });
-
-
     $("#play-multi-movie-btn2").click(function(){
         var player = document.getElementById("preview");
         var movieUrls = [
@@ -92,17 +83,4 @@ $( document ).ready(function() {
         var player = document.getElementById("preview");
         player.setBGM(soundUrls[1]);    
     });
-    $("#change-bgm-btn-3").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[2]);    
-    });
-    $("#change-bgm-btn-4").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[3]);    
-    });
-    $("#change-bgm-btn-5").click(function(){ 
-        var player = document.getElementById("preview");
-        player.setBGM(soundUrls[4]);    
-    });
-
 });
