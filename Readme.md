@@ -98,33 +98,28 @@ $ http-server build
 ### API & params
 
 #### flash vars
+
 | var | desc |
----------------
+|:---|---:|
 | debugEnable | use for show debug UI, in production, need remove this line or set value to fasle 
------------------
 | autoPlay | when we want to play immediate 
-------------------
 | soundUrl | init bgm sound url, used when autoPlay = true
-------------------
 | movieUrls | init queue movie urls, used when autoPlay = true
----------------
 | relativePath | set value to true to player know all urls we using as relative
-----------------
 | prependURL | auto add prefix url, for example if full url is: http://example.com/todaymovie/assets/movie01.mp4 => prependURL will be: "/todaymovie/assets/" 
---------------------
 
 
 
-#### exported method (api)
+
+#### exported method
+
 | method | desc |
-------------------
+|:---|---:|
 | playMovie(movieUrl, soundUrl) | play a movie by url
---------------------
 | playMultiMovies(movieUrls, soundUrl) | play queued movies with input is array of url and sound url
---------------------
 | setBGM (bgm url) | change background sound url 
-----------------------
-| 
+
+
 
 ### Feferences - Video Editor Engine Components
 ![alt editor](./doc/spec/editor.png)
