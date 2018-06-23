@@ -1,4 +1,11 @@
 $( document ).ready(function() {
+    // ====================== Util Func =========================
+    var isLocalHost = (function() {
+        return location.hostname === "localhost" 
+               || location.hostname === "127.0.0.1" 
+               || location.hostname === "";
+    })();
+
     // ====================== Create Data Test ==================
     
     // Test data with relative path
@@ -27,8 +34,7 @@ $( document ).ready(function() {
         // for example: if our's movies at path: 
         // http://example.com/todaymovie/assets/movie01.mp4
         // => prependURL will be: "/todaymovie/assets/" 
-        prependURL: location.pathname + "assets/"  
-            
+        prependURL: isLocalHost ? "/assets/" : "/queuevideoplayback/assets/";    
     };
     
     var params = {};
