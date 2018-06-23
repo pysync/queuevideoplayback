@@ -1,2 +1,0 @@
-ffmpeg -i movie21.mp4 -vcodec copy -acodec copy movie21.flv
-yamdi -i destination.flv -o destination.f4v

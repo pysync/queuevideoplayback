@@ -1,1 +1,0 @@
-ffmpeg -i raw01.mp4 -acodec copy -f segment -segment_time 10 -vcodec copy -reset_timestamps 1 -map 0 -an movie%d.mp4
