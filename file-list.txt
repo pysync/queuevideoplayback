@@ -2,7 +2,7 @@ Directory Information:
 
 
 + swf: 
-    MAN.swf: main flash player using to play movie [ PRODUCTION ]
+    MAN.swf: main pre-complied player using to play movie [ PRODUCTION ]
 	expressInstall.swf embed swf using for swfobject.js [ PRODUCTION ]
 
 + js/lib: 
