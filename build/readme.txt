@@ -7,7 +7,7 @@ Directory Information:
 
 + js/lib: 
     jquery-*.min.js: jquery library using for test [ TEST ONLY ]
-	swfobject.js: using for embed flash player to html [ PRODUCTION ]
+    swfobject.js: using for embed flash player to html [ PRODUCTION ]
 
 + js/test*.js: test script using for instruct how to use flash player. [ TEST ONLY ]
 
