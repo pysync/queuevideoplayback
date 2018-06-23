@@ -1,3 +1,7 @@
+![alt screenshot](./doc/screenshoots/screen1.png)
+
+[DEMO PAGE](https://dungntnew.github.io/queuevideoplayback/index.html)
+
 ### Description
 
 That video player engine is developed with ActionScript 3.0 and some libraries.
@@ -117,6 +121,12 @@ $ http-server .
 | setBGM (bgm url) | change background sound url 
 
 
+### Feferences - Sample Code
+![alt editor](./doc/screenshoots/code0.png)
+
+![alt editor](./doc/screenshoots/code1.png)
+
+![alt editor](./doc/screenshoots/code2.png)
 
 ### Feferences - Video Editor Engine Components
 ![alt editor](./doc/spec/editor.png)
